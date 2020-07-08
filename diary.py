@@ -1,4 +1,5 @@
 from peewee import *
+import datetime
 
 db = SqliteDatabase('diary.db') # La base de datos de del archivo diary
 
@@ -13,42 +14,56 @@ db = SqliteDatabase('diary.db') # La base de datos de del archivo diary
 '''
 class Entry(Model):
 
-    Class Meta:
+    #   Todos los atributos serán columnas
+    #   CharField es para cadenas cortas de texto
+    content = TextField()
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Meta:
         database = db
 
+#------------------------------------------------------------------------------------
 
-
-#    Primero, hacer un esquema básico de la funcionalidad del programa.
-
+#   Primero, hacer un esquema básico de la funcionalidad del programa.
 
 '''
 Añade una entrada (registro) nueva al diario
 
 '''
 def add_entry():
-
+    pass
 
 '''
 Elimina una entrada (registro) del diario
 
 '''
 def delete_entry():
-
+    pass
 
 '''
 Despliega todos los registros (entradas)
 
 '''
-def delete_entry():
-
+def view_entries():
+    pass
 
 '''
 Muestra un menú con las opciones
 
 '''
 def menu_loop():
+    pass
 
+'''
+Inicializa todo lo relacionado con la bd y crear las tablas
+
+'''
+def initialize():
+    db.connect() # Primero nos conectamos a la bd
+    db.create_tables([Entry], safe = True) # Después nos aseguramos que las tablas existan  
 #------------------------------------------------------------------------------------
 
-if if __name__ == "__main__":
+if __name__ == "__main__":
+    initialize()
     menu_loop()
+
