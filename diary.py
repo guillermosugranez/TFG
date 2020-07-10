@@ -1,90 +1,83 @@
 from peewee import *
 import datetime
-from collections import OrderedDict # Diccionario ordenado
+from collections import OrderedDict  # Diccionario ordenado
 
-db = SqliteDatabase('diary.db') # La base de datos de del archivo diary
+# ------------------------------------------------------------------------------
 
-'''
-    Clase Entrada
-    - Cada instancia es una entrada del diario
-    - Hereda de ka clase Model de peewee
-    - Tiene que tener:
-        - Una fecha (timestamp)
-        - Un contenido
+db = SqliteDatabase('diary.db')  # La base de datos de del archivo diary
 
-'''
+
 class Entry(Model):
+    '''Una entrada (Entry) es una entrada en el diario (un registro).
 
-    #   Todos los atributos serán columnas
-    #   CharField es para cadenas cortas de texto
+        - Todos los atributos serán columnas
+        - CharField es para cadenas cortas de texto
+        * Tiene:
+            - Una fecha
+            - Un contenido
+    '''
+
     content = TextField()
     timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Meta:
         database = db
 
-#------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 #   Primero, hacer un esquema básico de la funcionalidad del programa.
 
-'''
-Añade una entrada (registro) nueva al diario
 
-'''
 def add_entry():
     """Añade una nueva entrada al diario (nuevo registro)"""
+
     pass
 
-'''
-Elimina una entrada (registro) del diario
 
-'''
 def delete_entry():
     """Borra una entrada del diario (borra registro)"""
     pass
 
-'''
-Despliega todos los registros (entradas)
 
-'''
 def view_entries():
     """Muestra todas las entradas del diario (todos los registros)"""
     pass
 
+# ------------------------------------------------------------------------------
 
 menu = OrderedDict([
     ('a', add_entry),
     ('v', view_entries),
 ])
 
-'''
-Muestra un menú con las opciones
-- Es la primera funcionalidad a desarrollar
-- No hay switch, se puede hacer con diccionarios, pero para mantener el orden es mejor usar diccionarios ordenados (OrderedDict)
-'''
+
 def menu_loop():
     """Muestra el menú con las opciones"""
-    choice = None # None es una opción para poner un valor vacío (el usuario no ha elegido de primeras nada)
 
-    while choice != 'q': # Mientras no se elija la opción 'q', se seguirá desplegando el menú
+    choice = None  # Inicializa a un valor vacío.
+
+    while choice != 'q':  # Seguirá desplegando el menú mientras no se pulse q
         print("Presiona 'q' para salir")
         for key, value in menu.items():
             print('{}| {}'.format(key, value.__doc__))
-        choice = input('Eleccion: ').lower().strip() # lower lo pone todo a minuscula. strip elimina los espacios adicionales
+        choice = input('Eleccion: ').lower().strip()
+        # Por si la entrada no tiene un formato correcto:
+        # lower -> Pone todo a minuscula
+        # strip -> Elimina los espacios innecesarios
 
-        if choice in menu: # Se desea que las opciones que se envíen esten definidas en el menú (no vale mandar una 'x')
-            menu[choice]() # Hace la llamada
+        if choice in menu:  # La opción debe estar definida en el menu
+            menu[choice]()
 
-'''
-Inicializa todo lo relacionado con la bd y crear las tablas
 
-'''
 def initialize():
-    db.connect() # Primero nos conectamos a la bd
-    db.create_tables([Entry], safe = True) # Después nos aseguramos que las tablas existan  
-#------------------------------------------------------------------------------------
+    """Prepara la base de datos"""
+
+    db.connect()  # Se conecta
+    db.create_tables([Entry], safe=True)  # Crea las tablas
+    # safe=true evita crear modelos ya creados
+
+# ------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     initialize()
     menu_loop()
-
