@@ -2,6 +2,7 @@ from peewee import *
 import datetime
 import sys  # sys.stdin.read().strip()
 from collections import OrderedDict  # Diccionario ordenado
+import os  # Para hacer clear
 
 # ------------------------------------------------------------------------------
 
@@ -74,9 +75,11 @@ def view_entries(search_query=None):
     for entry in entries:
         # Primero la fecha
         timestamp = entry.timestamp.strftime('%A %b %d, %Y %I:%M%p')
+        clear()
         print(timestamp)
-        print("*****************")
+        print('+'*len(timestamp))
         print(entry.content)
+        print('\n\n'+'+'*len(timestamp) + '\n')  # Pone tantos + como caracteres haya
         print('Enter| siguiente entrada')
         print('d| Borrar entrada')
         print('q| Salir al menu')
@@ -113,6 +116,7 @@ def menu_loop():
     choice = None  # Inicializa a un valor vacío.
 
     while choice != 'q':  # Seguirá desplegando el menú mientras no se pulse q
+        clear()
         print("Presiona 'q' para salir")
         for key, value in menu.items():
             print('{}| {}'.format(key, value.__doc__))
@@ -122,6 +126,7 @@ def menu_loop():
         # strip -> Elimina los espacios innecesarios
 
         if choice in menu:  # La opción debe estar definida en el menu
+            clear()
             menu[choice]()
 
 
@@ -131,6 +136,13 @@ def initialize():
     db.connect()  # Se conecta
     db.create_tables([Entry], safe=True)  # Crea las tablas
     # safe=true evita crear modelos ya creados
+
+# ------------------------------------------------------------------------------
+# MÉTODOS DE UTILIDAD
+
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 # ------------------------------------------------------------------------------
 
