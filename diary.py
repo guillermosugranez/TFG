@@ -46,9 +46,16 @@ def add_entry():
             print('Guardar exitosamente')
 
 
-def delete_entry():
+def delete_entry(entry):
     """Borra una entrada del diario (borra registro)"""
-    pass
+
+    # Llama a view_entries despues de haber añadido nueva funcionalidad
+
+    response = input("Estás seguro? [yN]").lower()
+
+    if response == 'y':
+        entry.delete_instance()
+        print('Entrada borrada.')
 
 
 def view_entries(search_query=None):
@@ -71,19 +78,22 @@ def view_entries(search_query=None):
         print("*****************")
         print(entry.content)
         print('Enter| siguiente entrada')
-        print('q| salir al menu')
+        print('d| Borrar entrada')
+        print('q| Salir al menu')
 
         # Obtener la siguiente entrada del usuario
         next_action = input('Accion a realizar: [Nq]').lower().strip()
 
         if next_action == 'q':
             break
+        elif next_action == 'd':
+            delete_entry(entry)
 
 
 def search_entries():
     '''Busca una entrada con cierto texto'''
 
-    # Se añade funcionalidad al metodo view_entries
+    # Llama a view_entries despues de haber añadido nueva funcionalidad
     view_entries(input('Texto a buscar: '))
 
 
