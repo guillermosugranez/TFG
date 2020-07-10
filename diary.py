@@ -1,5 +1,6 @@
 from peewee import *
 import datetime
+import sys  # sys.stdin.read().strip()                              
 from collections import OrderedDict  # Diccionario ordenado
 
 # ------------------------------------------------------------------------------
@@ -18,6 +19,7 @@ class Entry(Model):
     '''
 
     content = TextField()
+    # La hora se establece en el consturctor de clase
     timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Meta:
@@ -31,8 +33,17 @@ class Entry(Model):
 def add_entry():
     """Añade una nueva entrada al diario (nuevo registro)"""
 
-    pass
+    # Mostrar instrucciones
+    print("Introduce tu registro. Presiona Ctrl+Z+Enter cuando termines.")
+    # data Contiene el texto que va introducir el usuario
+    # Se usa sys.stdin.read() para poder usar Ctrl+z+Enter como final de texto.
+    # En otros SOs, buscar EOF correspondiente
+    data = sys.stdin.read().strip()
 
+    if data:
+        if input("Guardar entrada? [Yn]").lower() != 'n':
+            Entry.create(content=data)
+            print('Guardar exitosamente')
 
 def delete_entry():
     """Borra una entrada del diario (borra registro)"""
