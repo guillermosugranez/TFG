@@ -1,6 +1,6 @@
 from peewee import *
 import datetime
-import sys  # sys.stdin.read().strip()                              
+import sys  # sys.stdin.read().strip()
 from collections import OrderedDict  # Diccionario ordenado
 
 # ------------------------------------------------------------------------------
@@ -45,6 +45,7 @@ def add_entry():
             Entry.create(content=data)
             print('Guardar exitosamente')
 
+
 def delete_entry():
     """Borra una entrada del diario (borra registro)"""
     pass
@@ -52,7 +53,25 @@ def delete_entry():
 
 def view_entries():
     """Muestra todas las entradas del diario (todos los registros)"""
-    pass
+
+    # Guarda en una lista todas las entrdas del diario recogidas con el select
+    entries = Entry.select().order_by(Entry.timestamp.desc())
+
+    # Ahora toca mostrarlas con un formato adecuado
+    for entry in entries:
+        # Primero la fecha
+        timestamp = entry.timestamp.strftime('%A %b %d, %Y %I:%M%p')
+        print(timestamp)
+        print("*****************")
+        print(entry.content)
+        print('Enter| siguiente entrada')
+        print('q| salir al menu')
+
+        # Obtener la siguiente entrada del usuario
+        next_action = input('Accion a realizar: [Nq]').lower().strip()
+
+        if next_action == 'q':
+            break
 
 # ------------------------------------------------------------------------------
 
