@@ -51,11 +51,17 @@ def delete_entry():
     pass
 
 
-def view_entries():
+def view_entries(search_query=None):
     """Muestra todas las entradas del diario (todos los registros)"""
 
+    # search_query se ha añadido como funcionalidad extra (search_entries)
+    # Por defecto es None, por si no se quiere usar la funcionalidad extra
     # Guarda en una lista todas las entrdas del diario recogidas con el select
     entries = Entry.select().order_by(Entry.timestamp.desc())
+
+    if search_query:
+        # Con where filtramos todas las entries que cumplen la condicion
+        entries = entries.where(Entry.content.contains(search_query))
 
     # Ahora toca mostrarlas con un formato adecuado
     for entry in entries:
@@ -73,11 +79,21 @@ def view_entries():
         if next_action == 'q':
             break
 
+
+def search_entries():
+    '''Busca una entrada con cierto texto'''
+
+    # Se añade funcionalidad al metodo view_entries
+    view_entries(input('Texto a buscar: '))
+
+
 # ------------------------------------------------------------------------------
 
+# Crear nuevas entradas para añadir nuevas funcionalidades
 menu = OrderedDict([
     ('a', add_entry),
     ('v', view_entries),
+    ('s', search_entries),
 ])
 
 
