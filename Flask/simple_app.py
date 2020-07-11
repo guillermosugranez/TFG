@@ -11,16 +11,30 @@ app = Flask(__name__)  # Instancia de una aplicación de flask
 # No puede haber dos vistas con el mismo nombre
 
 
-@app.route('/')  # Vista principal. Cuando los usuarios no ponen nada más
-# Añadida variable name. Por defecto name=Mundo
-# Añadida variable lastname. Por defecto lastname=!!!!
-def index(name='Mundo', lastname='!!!'):
-    '''Primera función '''
+@app.route('/')  # Vista principal.
+@app.route('/<name>')  # Vista principal.
+# <name> indica que todo lo que vaya despues de '/' sera la variable name
+# De esta manera, si no encuentra nada después de la barra dará error (404)
+# Flask resuelve este problema dando la posibilidad de añadir más rutas
+def index(name='Mundo'):
+    '''Función Principal'''
 
     # Si no hay parámetro name en el navegador, usará el name por defecto
     name = request.args.get('name', name)  # Busca el parámetro name en la dir.
-    lastname = request.args.get('lastname', lastname)
-    return "Hola {} {}. Mi primera aplicación de Flask.".format(name, lastname)
+    return "Hola {}. Mi primera aplicación de Flask.".format(name)
+
+
+@app.route('/add/<int:num1>/<int:num2>') # Se ponen tantas como posibilidades
+@app.route('/add/<float:num1>/<float:num2>')
+@app.route('/add/<int:num1>/<float:num2>')
+@app.route('/add/<float:num1>/<int:num2>')
+def add(num1=0, num2=0):
+    '''Suma dos numeros de la barra de direcciones'''
+
+    num1 = request.args.get('num1', num1)
+    num2 = request.args.get('num2', num2)
+
+    return "add: {} + {} es igual a {}.".format(num1, num2, num1 + num2)
 
 # Un script en flask se llama aplicación
 # Ejecuta la aplicación de flask.
@@ -54,3 +68,9 @@ app.run(debug=True, port=8000, host='0.0.0.0')
 # request es un objeto global que guarda toda la info de la petición http
 # Como es una variable global, se puede acceder a ella desde donde sea
 # Lo normal es manejarlo dentro de las vistas
+
+# -----------------------------------------------------------------------------
+# Lección 25. URLs
+
+# Se debe tratar de hacer legibles y cortas las urls
+# Cambiar /name=Guille por -> /Guille directamente
