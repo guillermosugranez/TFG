@@ -1,5 +1,6 @@
 from flask import Flask  # Flask es una clase del módulo flask
-from flask import request
+from flask import request  # Para los parámetros de la URL
+from flask import render_template  # Despliega una template con información
 
 # -----------------------------------------------------------------------------
 
@@ -31,19 +32,14 @@ def index(name='Mundo'):
 def add(num1, num2):
     '''Suma dos numeros de la barra de direcciones'''
 
-    return """
-        <!doctype html>
-        <html>
-            <head>
-                <title>Sumador</title>
-            </head>
-            <body>
-                <h1>
-                    add: {} + {} = {}
-                </h1>
-            </body>
-        </html>
-        """.format(num1, num2, num1 + num2)
+    # Se entregan las variables como parámetros
+    # Así, el HTML puede usarlas
+    # Hay que especificar el nombre de la variable que se usará en el HTML
+    # Para no enviar muchas variables, se usa un diccionario (context)
+    # El diccionario se envía desempaquetado(**)
+    # No tienes que extraer las variables en el otro extremo
+    context = {"num1": num1, "num2": num2}
+    return render_template("add.html", **context)
 
 # Un script en flask se llama aplicación
 # Ejecuta la aplicación de flask.
@@ -90,3 +86,11 @@ app.run(debug=True, port=8000, host='0.0.0.0')
 # Ahora se intenta mejorar el aspecto del sitio web
 # Hay dos maneras de desplegar HTML; Una larga y otra corta
 # Manera Larga: poner el html como respuesta
+# Esto no es una buena solución por muchos motivos (largo, no reutilizable...)
+
+# -----------------------------------------------------------------------------
+# Lección 27. Desplegando HTML Templates
+
+# Los templates representan el HTML de la aplicación
+# Se guardan en una carpeta aparte. Por defecto es templates
+# Flask por defecto irá hasta allí a buscarlas si las necesita
