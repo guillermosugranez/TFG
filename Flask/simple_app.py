@@ -20,9 +20,8 @@ app = Flask(__name__)  # Instancia de una aplicación de flask
 def index(name='Mundo'):
     '''Función Principal'''
 
-    # Si no hay parámetro name en el navegador, usará el name por defecto
-    name = request.args.get('name', name)  # Busca el parámetro name en la dir.
-    return "Hola {}. Mi primera aplicación de Flask.".format(name)
+    context = {'name': name}
+    return render_template('index.html', **context)
 
 
 @app.route('/add/<int:num1>/<int:num2>')  # Se ponen tantas como posibilidades
@@ -89,8 +88,16 @@ app.run(debug=True, port=8000, host='0.0.0.0')
 # Esto no es una buena solución por muchos motivos (largo, no reutilizable...)
 
 # -----------------------------------------------------------------------------
-# Lección 27. Desplegando HTML Templates
+# Lección 28. Desplegando HTML Templates
 
 # Los templates representan el HTML de la aplicación
 # Se guardan en una carpeta aparte. Por defecto es templates
 # Flask por defecto irá hasta allí a buscarlas si las necesita
+
+# -----------------------------------------------------------------------------
+# Lección 29. Herencia de templates
+
+# Si las templates son muy parecidas, se pueden generalizar y ahorrar código
+# Se usan bloques html ({% block %}), con solo un par de llaves
+# Para imprimir las variables se tienen que usar dos pares de llaves
+# Se hacen diferentes tipos de bloques (content, title, head...)
