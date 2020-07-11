@@ -101,3 +101,8 @@ app.run(debug=True, port=8000, host='0.0.0.0')
 # Se usan bloques html ({% block %}), con solo un par de llaves
 # Para imprimir las variables se tienen que usar dos pares de llaves
 # Se hacen diferentes tipos de bloques (content, title, head...)
+
+# -----------------------------------------------------------------------------
+# Lección 30. Archivos estáticos (css)
+
+# Los arhivos estáticos se guardan en static por defecto (como los templates)
