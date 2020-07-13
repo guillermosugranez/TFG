@@ -106,3 +106,7 @@ app.run(debug=True, port=8000, host='0.0.0.0')
 # Lección 30. Archivos estáticos (css)
 
 # Los arhivos estáticos se guardan en static por defecto (como los templates)
+# Se suele enlazar en html con el tag link
+# El atributo rel, define un enlace hacía un recurso externo
+# Si el recurso externo es una hoja de estilo se usa rel="stylesheet"
+# href indica la ubicación del recurso externo
