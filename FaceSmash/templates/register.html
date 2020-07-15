@@ -1,0 +1,15 @@
+<form class="form" action="" method="post">
+    {{ form.hidden_tag }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
+    {% for field in form %} <!--Las llaves con porcentajes sirven para ejecutar cierto código en python-->
+        <div class="field">
+            {% if field.errors %}
+                {% for error in field.errors %}
+                <div class="notification error">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            {{ field(placeholder=field.label.text) }} <!--Aquí muestra el campo de texto que hay por cada elemento del registerform-->
+        </div>
+    {% endfor %}
+</form>

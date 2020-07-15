@@ -1,9 +1,12 @@
 # g es un objeto global donde guardar la info de la app que queramos
 # Como es global, es accesible en todo el proyecto.
 # Para la ocasión, se usará para los métodos before y after request
-from flask import Flask, g
+# flash desplegar un mensaje después de la siguiente petición
+# url_for es para generar una url a un cierto endpoint
+from flask import Flask, g, render_template, flash, url_for, redirect
 from flask_login import LoginManager
 import models
+import forms
 
 DEBUG = True  # Mayúsuculas indica que es global (por convenio)
 PORT = 8000
@@ -59,6 +62,29 @@ def after_request(response):  # response es la respuesta a la petición
 
     g.db.close()
     return response
+
+@app.route('/register', methods=('GET', 'POST'))  # Métodos HTTP usados aquí
+def register():
+    '''Vista para registrar un usuario'''
+    form = forms.RegisterForm()
+    if form.validate_on_submit():  # La información del formulario es válida
+        flash('¡¡ Usted se ha registrado con éxito !!', success)
+        models.User.create_user(  # Ahora podemos crear el usuario
+            username = form.username.data,
+            email = form.email.data,
+            password = form.password.data
+        )
+        return redirect(url_for('index'))
+
+
+@app.route('/')
+def index():
+    '''Vista principal'''
+
+    return 'Hey'
+
+
+    return g
 
 
 if __name__ == "__main__":
