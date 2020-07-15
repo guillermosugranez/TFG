@@ -1,7 +1,7 @@
 # g es un objeto global donde guardar la info de la app que queramos
 # Como es global, es accesible en todo el proyecto.
-# Para la ocasión, se usará para 
-from flask import Flask, g 
+# Para la ocasión, se usará para los métodos before y after request
+from flask import Flask, g, LoginManager()
 
 import models
 
@@ -10,6 +10,28 @@ PORT = 8000
 HOST = '0.0.0.0'
 
 app = Flask(__name__)  # Se instancia la aplicación
+app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnvñ´lsjdAsCaxcAv' # Llave Secreta.
+# Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
+# Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
+
+login_manager = LoginManager()  # Se crea una variable donde alojarlo
+login_manager.init_app(app)  # Login manager va a controlar las sesiones de app
+
+# Qué vista mostrar cuando el usuario quiera loguearse o sea redirigido
+login_manager.login_view('login')  # Vista login aún no creada
+
+
+@login_manager.user_loader
+def load_user(userid):
+    '''Método para cargar el usuario qué esté logueado'''
+
+    try:
+        # Devuelve el registro del usuario que tenga el mismo id que buscamos
+        return models.User.get(model.User.id == userid)
+    except: models.DoesNotExist:
+        return None
+
+
 
 # Por convenino se usan (y se nombrar así) los siguientes métodos:
 # El nombre de los métodos es opcional.
@@ -44,4 +66,10 @@ def after_request(response):  # response es la respuesta a la petición
 
 if if __name__ == "__main__":
     app.run(debug=DEBUG, host=HOST, port=PORT)
+
+
+# -----------------------------------------------------------------------------
+# Lección 38 - Funcionalidad del logueo de los usuarios
+
+# Para esta tarea, se usa el módulo de flask LoginManager()
 
