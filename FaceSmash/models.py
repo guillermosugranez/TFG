@@ -6,7 +6,7 @@ from flask_login import UserMixin
 from flask_bcrypt import generate_password_hash
 
 
-DATEBASE = SqliteDatabase("social.db")
+DATABASE = SqliteDatabase("social.db")
 
 # Lo más esencial en una red social son los usuarios.
 # Hay que definir un modelo que los represente
@@ -23,7 +23,7 @@ class User(UserMixin, Model):
     # Cualquier modelo necesita la class Meta
     # Añade información extra, al margen de los atributos, métodos... etc.
     class Meta:
-        datebase = DATEBASE  # Indica cuál es la bbdd del modelo
+        datebase = DATABASE  # Indica cuál es la bbdd del modelo
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at")
 
@@ -44,6 +44,14 @@ class User(UserMixin, Model):
             )
         except IntegrityError:
             raise ValueError("User Already exists")
+
+
+def initialize():
+    '''Crea las tablas del proyecto a partir de los modelos propuestos'''
+
+    DATABASE.connect()  # Establece la conexión
+    DATABASE.create_tables([User], safe=True)
+    DATABASE.close()  # Se cierra
 
 # -----------------------------------------------------------------------------
 # Lección 34. UserMixin
@@ -85,3 +93,13 @@ class User(UserMixin, Model):
 #   >>>
 
 # -----------------------------------------------------------------------------
+# Lección 39 - Creando nuestras tablas
+#
+# Hay que crear las tablas a partir de los modelos propuestos
+# Por legibilidad, esta tarea se define en un método 
+
+# -----------------------------------------------------------------------------
+# Lección 39 - Formularios
+# La información en la web se recibe con formularios
+# En este asunto, es muy importante la seguiradad y la integridad
+# Para manejar formularios en flask, se usa flask_forms

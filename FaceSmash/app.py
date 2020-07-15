@@ -1,8 +1,8 @@
 # g es un objeto global donde guardar la info de la app que queramos
 # Como es global, es accesible en todo el proyecto.
 # Para la ocasión, se usará para los métodos before y after request
-from flask import Flask, g, LoginManager()
-
+from flask import Flask, g
+from flask_login import LoginManager
 import models
 
 DEBUG = True  # Mayúsuculas indica que es global (por convenio)
@@ -10,7 +10,7 @@ PORT = 8000
 HOST = '0.0.0.0'
 
 app = Flask(__name__)  # Se instancia la aplicación
-app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnvñ´lsjdAsCaxcAv' # Llave Secreta.
+app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnv´lsjdAsCaxcAv'  # Llave Secreta.
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
@@ -18,7 +18,7 @@ login_manager = LoginManager()  # Se crea una variable donde alojarlo
 login_manager.init_app(app)  # Login manager va a controlar las sesiones de app
 
 # Qué vista mostrar cuando el usuario quiera loguearse o sea redirigido
-login_manager.login_view('login')  # Vista login aún no creada
+login_manager.login_view('login')
 
 
 @login_manager.user_loader
@@ -27,10 +27,9 @@ def load_user(userid):
 
     try:
         # Devuelve el registro del usuario que tenga el mismo id que buscamos
-        return models.User.get(model.User.id == userid)
-    except: models.DoesNotExist:
-        return None
-
+        return models.User.get(models.User.id == userid)
+    except models.DoesNotExist:
+            return None
 
 
 # Por convenino se usan (y se nombrar así) los siguientes métodos:
@@ -42,8 +41,7 @@ def load_user(userid):
 @app.before_request  # Decorador
 def before_request():
     '''Método que se ejecuta antes de hacer una petición (request) a la bbdd.
-    
-    Establece las conexiones a la bbdd
+    - Establece las conexiones a la bbdd
     '''
 
     # Esta funcion verifica que el objeto g no tenga ya definido el atributo db
@@ -56,17 +54,24 @@ def before_request():
 @app.after_request
 def after_request(response):  # response es la respuesta a la petición
     '''Método que se ejecuta después de hacer una petición (request) a la bbdd.
-    
-    Cierra las conexiones con la bbdd
+    - Cierra las conexiones con la bbdd
     '''
 
     g.db.close()
     return response
+
+
+if __name__ == "__main__":
+    '''Función principal del proyecto. LLama a los demás métodos'''
     
+    models.initialize()
+    models.User.create_user(
+        username='Guille',
+        email='guillecor91@gmail.com',
+        password=1234
+    )
 
-if if __name__ == "__main__":
     app.run(debug=DEBUG, host=HOST, port=PORT)
-
 
 # -----------------------------------------------------------------------------
 # Lección 38 - Funcionalidad del logueo de los usuarios
