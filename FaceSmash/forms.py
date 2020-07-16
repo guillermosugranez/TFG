@@ -1,17 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField
-
 from wtforms.validators import (  # Validadores para los formularios
     DataRequired, ValidationError, Email, Regexp, Length, EqualTo
 )
 
-import models
+from models import User
 
 
 def name_exists(form, field):
     '''Controla que el usuario no esté ya creado'''
 
-    if User.select().where(User.username == field.data).exits():
+    if User.select().where(User.username == field.data).exists():
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese nombre.")
 
@@ -19,7 +18,7 @@ def name_exists(form, field):
 def email_exists(form, field):
     '''Controla que el eMail no exista ya'''
 
-    if User.select().where(User.email == field.data).exits():
+    if User.select().where(User.email == field.data).exists():
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese eMail")
 
@@ -57,3 +56,8 @@ class RegisterForm(FlaskForm):
             DataRequired()  # Solo debe existir
         ]
     )
+
+
+def LoginForm(Form):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
