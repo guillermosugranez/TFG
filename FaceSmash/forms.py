@@ -58,6 +58,6 @@ class RegisterForm(FlaskForm):
     )
 
 
-def LoginForm(Form):
+class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])

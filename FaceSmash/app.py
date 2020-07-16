@@ -68,6 +68,7 @@ def after_request(response):  # response es la respuesta a la petición
 @app.route('/register', methods=('GET', 'POST'))  # Métodos HTTP usados aquí
 def register():
     '''Vista para registrar un usuario'''
+
     form = forms.RegisterForm()
     if form.validate_on_submit():  # La información del formulario es válida
         # Flash despliega un mensaje después de aceptar el formulario
@@ -86,22 +87,23 @@ def register():
 def login():
     '''Vista login'''
 
+    # En estas dos primeras lineas, se usa la macro para renderizar el form
     form = forms.LoginForm()  # Se define el formulario
     if form.validate_on_submit():  # Si los datos pasan los validadores...
         try:
             # Query en busca del registro cuyo eMail es el escrito en el form
-            user = models.User.get(models.user.email == form.email.data)
+            user = models.User.get(models.User.email == form.email.data)
         except models.DoesNotExist:  # No existe ese usuario
             flash('Tu nombre de usuario o contraseña no existe', 'error')
         else:  # Si el usuario si existe hay que comprobar su contraseña
-            if check_password_hash(user.password == form.password.data):
+            if check_password_hash(user.password, form.password.data):
                 login_user(user)  # Se loguea con la librería de flask
                 flash('Has iniciado sesión', 'success')
                 return redirect(url_for('index'))
-            # else:
-            #     flash('Tu nombre de usuario o contraseña no existe', 'error')
+            else:
+                flash('Tu nombre de usuario o contraseña no existe', 'error')
 
-    return render_template('login.html', form=form)
+    return render_template('login.html', form=form)  # Usa macro para render
 
 
 @app.route('/')
