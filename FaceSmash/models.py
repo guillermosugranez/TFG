@@ -5,7 +5,6 @@ from peewee import *
 from flask_login import UserMixin
 from flask_bcrypt import generate_password_hash
 
-
 DATABASE = SqliteDatabase("social.db")
 
 # Lo más esencial en una red social son los usuarios.
@@ -23,7 +22,7 @@ class User(UserMixin, Model):
     # Cualquier modelo necesita la class Meta
     # Añade información extra, al margen de los atributos, métodos... etc.
     class Meta:
-        datebase = DATABASE  # Indica cuál es la bbdd del modelo
+        database = DATABASE  # Indica cuál es la bbdd del modelo
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at")
 
@@ -40,10 +39,11 @@ class User(UserMixin, Model):
             cls.create( # Crea un registro en la bbdd
                 username=username,
                 email=email,
-                password=generate_password_hash(password),
+                password= generate_password_hash(password),
             )
         except IntegrityError:
-            raise ValueError("User Already exists")
+            pass
+            # raise ValueError("User Already exists")
 
 
 def initialize():

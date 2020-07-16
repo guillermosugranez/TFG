@@ -1,8 +1,11 @@
 from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, TextAreaField
+
 from wtforms.validators import (  # Validadores para los formularios
     DataRequired, ValidationError, Email, Regexp, Length, EqualTo
 )
-from models import User
+
+import models
 
 
 def name_exists(form, field):

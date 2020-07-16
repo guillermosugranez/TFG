@@ -21,16 +21,16 @@ login_manager = LoginManager()  # Se crea una variable donde alojarlo
 login_manager.init_app(app)  # Login manager va a controlar las sesiones de app
 
 # Qué vista mostrar cuando el usuario quiera loguearse o sea redirigido
-login_manager.login_view('login')
+login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(userid):
+def load_user(username):
     '''Método para cargar el usuario qué esté logueado'''
 
     try:
         # Devuelve el registro del usuario que tenga el mismo id que buscamos
-        return models.User.get(models.User.id == userid)
+        return models.User.get(models.User.username == username)
     except models.DoesNotExist:
             return None
 
@@ -50,7 +50,7 @@ def before_request():
     # Esta funcion verifica que el objeto g no tenga ya definido el atributo db
     # Esto evita errores al tratar de volver a definirlo.
     if not hasattr(g, 'db'):
-        g.db = models.DB  # La bbdd es la definida en el archivo models
+        g.db = models.DATABASE  # La bbdd es la definida en el archivo models
         g.db.connect()
 
 
@@ -63,18 +63,22 @@ def after_request(response):  # response es la respuesta a la petición
     g.db.close()
     return response
 
+
 @app.route('/register', methods=('GET', 'POST'))  # Métodos HTTP usados aquí
 def register():
     '''Vista para registrar un usuario'''
     form = forms.RegisterForm()
     if form.validate_on_submit():  # La información del formulario es válida
-        flash('¡¡ Usted se ha registrado con éxito !!', success)
+        # Flash despliega un mensaje después de aceptar el formulario
+        # To flash a message with a different category
+        flash('¡¡ Usted se ha registrado con éxito !!', 'success')
         models.User.create_user(  # Ahora podemos crear el usuario
             username = form.username.data,
             email = form.email.data,
             password = form.password.data
         )
         return redirect(url_for('index'))
+    return render_template('register.html', form=form)
 
 
 @app.route('/')
@@ -84,9 +88,6 @@ def index():
     return 'Hey'
 
 
-    return g
-
-
 if __name__ == "__main__":
     '''Función principal del proyecto. LLama a los demás métodos'''
     
@@ -94,7 +95,7 @@ if __name__ == "__main__":
     models.User.create_user(
         username='Guille',
         email='guillecor91@gmail.com',
-        password=1234
+        password="1234"  # Tiene que ser una cadena
     )
 
     app.run(debug=DEBUG, host=HOST, port=PORT)
