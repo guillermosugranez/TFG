@@ -4,9 +4,10 @@
 # flash desplegar un mensaje después de la siguiente petición
 # url_for es para generar una url a un cierto endpoint
 from flask import Flask, g, render_template, flash, url_for, redirect
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user
+from flask_bcrypt import check_password_hash
 import models
-import forms
+import forms  # LoginForm, RegisterForm
 
 DEBUG = True  # Mayúsuculas indica que es global (por convenio)
 PORT = 8000
@@ -79,6 +80,28 @@ def register():
         )
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
+
+
+@app.route('/login', methods=('GET', 'POST'))
+def login():
+    '''Vista login'''
+
+    form = forms.LoginForm()  # Se define el formulario
+    if form.validate_on_submit():  # Si los datos pasan los validadores...
+        try:
+            # Query en busca del registro cuyo eMail es el escrito en el form
+            user = models.User.get(models.user.email == form.email.data)
+        except models.DoesNotExist:  # No existe ese usuario
+            flash('Tu nombre de usuario o contraseña no existe', 'error')
+        else:  # Si el usuario si existe hay que comprobar su contraseña
+            if check_password_hash(user.password == form.password.data):
+                login_user(user)  # Se loguea con la librería de flask
+                flash('Has iniciado sesión', 'success')
+                return redirect(url_for('index'))
+            # else:
+            #     flash('Tu nombre de usuario o contraseña no existe', 'error')
+
+    return render_template('login.html', form=form)
 
 
 @app.route('/')
