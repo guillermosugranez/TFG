@@ -61,7 +61,7 @@ class Post(Model):
         related_name='posts',  # Nombre relacionado en la otra tabla
 
     )
-    timestamp = DateTimeField(dafault=datetime.datetime.now)
+    timestamp = DateTimeField(default=datetime.datetime.now)
     content = TextField()
 
     class Meta:
@@ -69,8 +69,6 @@ class Post(Model):
 
         # La coma indica que es una tupla. Evita posibles errores
         order_by = ('-joined_at',)
-
-
 
 
 def initialize():

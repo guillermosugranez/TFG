@@ -22,6 +22,9 @@ def email_exists(form, field):
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese eMail")
 
+# ==============================================================================
+
+# Cada campo en las clases, significa un campo en el HTML
 
 class RegisterForm(FlaskForm):
     username = StringField(
@@ -61,3 +64,9 @@ class RegisterForm(FlaskForm):
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
+
+
+class PostForm(FlaskForm):
+    '''Formulario para el contenido del Post. Hace falta escribir algo'''
+
+    content = TextAreaField('Qué piensas', validators=[DataRequired()])

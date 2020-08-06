@@ -5,6 +5,7 @@
 # url_for es para generar una url a un cierto endpoint
 from flask import Flask, g, render_template, flash, url_for, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required
+from flask_login import current_user  # A partir de la vista de Post
 from flask_bcrypt import check_password_hash
 import models
 import forms  # LoginForm, RegisterForm
@@ -52,7 +53,13 @@ def before_request():
     # Esto evita errores al tratar de volver a definirlo.
     if not hasattr(g, 'db'):
         g.db = models.DATABASE  # La bbdd es la definida en el archivo models
+
+    if not hasattr(g, 'user'):
+        g.user = current_user  # Usuario actual definido en flask
+
+    if g.db.is_closed():
         g.db.connect()
+        g.user = current_user
 
 
 @app.after_request
@@ -114,6 +121,25 @@ def logout():
     logout_user()  # Termina la sesión de usuario
     flash('Has salido de FaceSmash', 'success')
     return redirect(url_for('index'))
+
+
+@app.route('/new_post', methods=('GET', 'POST'))
+def post():
+    '''Permite crear nuevos post usando el formulario correspondiente'''
+
+    form = forms.PostForm()
+
+    # Se ejecuta el método si la validación al hacer click en el HTML es correcta
+    if form.validate_on_submit():
+
+        # Se crea un nuevo post en la tabla
+        models.Post.create(user=g.user._get_current_objet(),
+                           content=form.content.data.strip()  # Quita espacios
+        )
+        flash('Mensaje Posteado', 'success')
+        return redirect(url_for('index'))
+
+    return render_template('post.html', form=form)
 
 
 @app.route('/')
