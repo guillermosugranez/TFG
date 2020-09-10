@@ -24,7 +24,13 @@ class User(UserMixin, Model):
     class Meta:
         database = DATABASE  # Indica cuál es la bbdd del modelo
         # Indica cómo serán ordenados los registros cuando sean creados
-        order_by = ("-joined_at")
+        order_by = ("-joined_at",)
+
+
+    # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
+    def get_posts(self):
+         # Primero coge todos, luego filtra al objeto que llama
+        return Post.select().where(Post.user == self)
 
     # Constructor
     # cls hace que el método sea de la misma clase, y no de la instancia
@@ -44,6 +50,25 @@ class User(UserMixin, Model):
         except IntegrityError:
             pass
             # raise ValueError("User Already exists")
+
+
+class Post(Model):
+    '''Pequeños mensajes que aparecen en el timeline de FaceSmash'''
+
+    # Qué es lo que tiene un post?
+    user = ForeignKeyField(  # Hace refencia a un usuario
+        User,  # A dónde apunta esta clave foranea? Hacia un usuario
+        related_name='posts',  # Nombre relacionado en la otra tabla
+
+    )
+    timestamp = DateTimeField(default=datetime.datetime.now)
+    content = TextField()
+
+    class Meta:
+        datebase = DATABASE
+
+        # La coma indica que es una tupla. Evita posibles errores
+        order_by = ('-joined_at',)
 
 
 def initialize():
