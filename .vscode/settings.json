@@ -1,3 +1,10 @@
 {
-    "editor.fontSize": 16
+    "editor.fontSize": 16,
+    "python.pythonPath": "C:\\Users\\Guillermo\\.conda\\envs\\pytfg\\python.exe",
+    "python.testing.pytestArgs": [
+        "FaceSmash"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true
 }
