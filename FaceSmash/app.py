@@ -4,7 +4,7 @@
 # flash desplegar un mensaje después de la siguiente petición
 # url_for es para generar una url a un cierto endpoint
 from flask import Flask, g, render_template, flash, url_for, redirect
-from flask_login import LoginManager, login_user
+from flask_login import LoginManager, login_user, login_required, logout_user
 from flask_bcrypt import check_password_hash
 import models
 import forms  # LoginForm, RegisterForm
@@ -104,6 +104,14 @@ def login():
                 flash('Tu nombre de usuario o contraseña no existe', 'error')
 
     return render_template('login.html', form=form)  # Usa macro para render
+
+
+@app.route('/logout')
+@login_required  # La vista se ejecuta solo si el usuario se ha logueado
+def logout():
+    logout_user()  # No se especifica user. Solo hay uno al mismo tiempo
+    flash('Has salido de FaceSmash!', 'success')
+    return redirect(url_for('index'))
 
 
 @app.route('/')
