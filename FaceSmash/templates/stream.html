@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    {% for post in stream %}
+        <article>
+            <!--Timeline del usuario-->
+            <h2>
+                <!-- Nos lleva cuando pulsamos sobre el nombre del usuario-->
+                <a href="{{ url_for('stream', username=post.user.username) }}">
+                    {{ post.user.username }}
+                </a>
+            </h2>
+            <!--Timeline general-->
+            <i class="clock"></i><!-- La i sirve para dar información al javascript -->
+            <time data-time="{{post.timestamp}}" class="distime" datetime = "{{ post.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}">"{{ post.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</time>
+            <a href="#" class="view">Ver</a>
+            <div class="post">
+                {{ post.content }}
+            </div>
+        </article>
+    {% endfor %}
+{% endblock %}
