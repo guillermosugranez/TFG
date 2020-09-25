@@ -56,8 +56,8 @@ class Post(Model):
     """Pequeños mensajes que aparecen en el timeline de FaceSmash"""
 
     # Qué es lo que tiene un post?
-    user = ForeignKeyField(  # Hace refencia a un usuario
-        User,  # A dónde apunta esta clave foranea? Hacia un usuario
+    user = ForeignKeyField(  # Hace referencia a un usuario
+        User,  # A dónde apunta esta clave foránea? Hacia un usuario
         related_name='posts',  # Nombre relacionado en la otra tabla
 
     )
@@ -65,7 +65,7 @@ class Post(Model):
     content = TextField()
 
     class Meta:
-        datebase = DATABASE
+        database = DATABASE
 
         # La coma indica que es una tupla. Evita posibles errores
         order_by = ('-joined_at',)
@@ -75,7 +75,7 @@ def initialize():
     """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
     DATABASE.connect()  # Establece la conexión
-    DATABASE.create_tables([User], safe=True)
+    DATABASE.create_tables([User, Post], safe=True)
     DATABASE.close()  # Se cierra
 
 # -----------------------------------------------------------------------------
