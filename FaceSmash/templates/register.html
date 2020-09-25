@@ -1,9 +1,12 @@
 {% from 'macros.html' import render_field %}
+{% extends "layout.html" %}
 
-<form class="form" action="" method="post">
-    {{ form.hidden_tag() }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
-    {% for field in form %} <!--Las llaves con porcentajes sirven para ejecutar cierto código en python-->
-        {{ render_field(field) }}
-    {% endfor %}
-    <button type="submit" id="submit">Registrarse</button>
-</form>
+{% block content %}
+    <form class="form" action="" method="post">
+        {{ form.hidden_tag() }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
+        {% for field in form %} <!--Las llaves con porcentajes sirven para ejecutar cierto código en python-->
+            {{ render_field(field) }}
+        {% endfor %}
+        <button type="submit" id="submit">Registrarse</button>
+    </form>
+{% endblock %}

@@ -1,16 +1,17 @@
 # g es un objeto global donde guardar la info de la app que queramos
 # Como es global, es accesible en todo el proyecto.
 # Para la ocasión, se usará para los métodos before y after request
-# flash desplegar un mensaje después de la siguiente petición
+# flash -> desplegar un mensaje después de la siguiente petición
 # url_for es para generar una url a un cierto endpoint
 from flask import Flask, g, render_template, flash, url_for, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_login import current_user  # A partir de la vista de Post
 from flask_bcrypt import check_password_hash
+
 import models
 import forms  # LoginForm, RegisterForm
 
-DEBUG = True  # Mayúsuculas indica que es global (por convenio)
+DEBUG = True  # Mayúsculas indica que es global (por convenio)
 PORT = 8000
 HOST = '0.0.0.0'
 
@@ -28,16 +29,16 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(username):
-    '''Método para cargar el usuario qué esté logueado'''
+    """Método para cargar el usuario qué esté logueado"""
 
     try:
         # Devuelve el registro del usuario que tenga el mismo id que buscamos
         return models.User.get(models.User.username == username)
     except models.DoesNotExist:
-            return None
+        return None
 
 
-# Por convenino se usan (y se nombrar así) los siguientes métodos:
+# Por convenio se usan (y se nombran así) los siguientes métodos:
 # El nombre de los métodos es opcional.
 # Lo que hace que tengan la característica especial deseada es el decorador
 # Un decorador es una función que envuelven a otras funciones. Empiezan por @
@@ -45,11 +46,11 @@ def load_user(username):
 
 @app.before_request  # Decorador
 def before_request():
-    '''Método que se ejecuta antes de hacer una petición (request) a la bbdd.
+    """Método que se ejecuta antes de hacer una petición (request) a la bbdd.
     - Establece las conexiones a la bbdd
-    '''
+    """
 
-    # Esta funcion verifica que el objeto g no tenga ya definido el atributo db
+    # Esta función verifica que el objeto g no tenga ya definido el atributo db
     # Esto evita errores al tratar de volver a definirlo.
     if not hasattr(g, 'db'):
         g.db = models.DATABASE  # La bbdd es la definida en el archivo models
@@ -59,14 +60,13 @@ def before_request():
 
     if g.db.is_closed():
         g.db.connect()
-        g.user = current_user
 
 
 @app.after_request
 def after_request(response):  # response es la respuesta a la petición
-    '''Método que se ejecuta después de hacer una petición (request) a la bbdd.
+    """Método que se ejecuta después de hacer una petición (request) a la bbdd.
     - Cierra las conexiones con la bbdd
-    '''
+    """
 
     g.db.close()
     return response
@@ -74,7 +74,7 @@ def after_request(response):  # response es la respuesta a la petición
 
 @app.route('/register', methods=('GET', 'POST'))  # Métodos HTTP usados aquí
 def register():
-    '''Vista para registrar un usuario'''
+    """Vista para registrar un usuario"""
 
     form = forms.RegisterForm()
     if form.validate_on_submit():  # La información del formulario es válida
@@ -82,9 +82,9 @@ def register():
         # To flash a message with a different category
         flash('¡¡ Usted se ha registrado con éxito !!', 'success')
         models.User.create_user(  # Ahora podemos crear el usuario
-            username = form.username.data,
-            email = form.email.data,
-            password = form.password.data
+            username=form.username.data,
+            email=form.email.data,
+            password=form.password.data
         )
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
@@ -92,7 +92,7 @@ def register():
 
 @app.route('/login', methods=('GET', 'POST'))
 def login():
-    '''Vista iniciar sesión al usuario'''
+    """Vista iniciar sesión al usuario"""
 
     # En estas dos primeras lineas, se usa la macro para renderizar el form
     form = forms.LoginForm()  # Se define el formulario
@@ -116,7 +116,7 @@ def login():
 @app.route('/logout')
 @login_required  # Puede haber más de un decorador. Este requiere estar logado
 def logout():
-    '''Permite cerrar sesión al usuario'''
+    """Permite cerrar sesión al usuario"""
 
     logout_user()  # Termina la sesión de usuario
     flash('Has salido de FaceSmash', 'success')
@@ -125,17 +125,19 @@ def logout():
 
 @app.route('/new_post', methods=('GET', 'POST'))
 def post():
-    '''Permite crear nuevos post usando el formulario correspondiente'''
+    """Permite crear nuevos post usando el formulario correspondiente"""
 
     form = forms.PostForm()
 
-    # Se ejecuta el método si la validación al hacer click en el HTML es correcta
+    # Se ejecuta el método si la validación al hacer click en el HTML es válida
     if form.validate_on_submit():
 
         # Se crea un nuevo post en la tabla
-        models.Post.create(user=g.user._get_current_objet(),
-                           content=form.content.data.strip()  # Quita espacios
-        )
+        # _get_current_object() te da el objeto real al que está referenciando
+        # Esto lo tiene que hacer porque current_user es un proxy.
+        # models.Post.create(user=g.user._get_current_object(),
+        models.Post.create(user=g.user,
+                           content=form.content.data.strip())  # Quita espacios
         flash('Mensaje Posteado', 'success')
         return redirect(url_for('index'))
 
@@ -144,13 +146,13 @@ def post():
 
 @app.route('/')
 def index():
-    '''Vista principal'''
+    """Vista principal"""
 
     return 'Hey'
 
 
 if __name__ == "__main__":
-    '''Función principal del proyecto. LLama a los demás métodos'''
+    """Función principal del proyecto. LLama a los demás métodos"""
     
     models.initialize()
     models.User.create_user(
@@ -165,4 +167,3 @@ if __name__ == "__main__":
 # Lección 38 - Funcionalidad del logueo de los usuarios
 
 # Para esta tarea, se usa el módulo de flask LoginManager()
-
