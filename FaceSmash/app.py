@@ -153,6 +153,28 @@ def index():
     return render_template('stream.html', stream=stream)
 
 
+@app.route('/stream')
+@app.route('/stream/<username>')
+def stream(username=None):
+    """Muestra hasta 100 post
+    - Cuando no se le proporciona nombre de usuario, te muestra el general
+    - Cuando se le proporciona un nombre te muestra solo los de ese usuario
+    """
+
+    template = 'stream.html'
+    if username and username != current_user.username:
+        # El ** sirve para hacer like. Ignora mayúsculas y minúsculas
+        # .get() solo te da un registro, una instancia
+        user = models.User.select().where(models.User.username**username).get()
+        stream = user.posts.limit(100)
+    else:
+        stream = current_user.get_stream().limit(100)
+        user = current_user
+    if username:
+        template = 'user_stream.html'
+    return render_template(template, stream=stream, user=user)
+
+
 if __name__ == "__main__":
     """Función principal del proyecto. LLama a los demás métodos"""
     

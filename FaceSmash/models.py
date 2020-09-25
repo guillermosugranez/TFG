@@ -29,6 +29,9 @@ class User(UserMixin, Model):
     def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
         return Post.select().where(Post.user == self)
 
+    def get_stream(self):  # Primero coge todos, luego filtra al objeto que llama
+        return Post.select().where(Post.user == self)
+
     # Constructor
     # cls hace que el método sea de la misma clase, y no de la instancia
     # Esto es aconsejable por legibilidad entre otras cuestiones (PEP8)
