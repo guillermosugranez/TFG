@@ -26,7 +26,7 @@
                     <h1>
                         Hola
                         {% if current_user.is_authenticated %}
-                            {{ current_user.username }} !!
+                            {{ current_user.username }}!
                         {% endif %}
                     </h1>
                 </div>
@@ -55,12 +55,12 @@
             {% if messages %} <!-- Solo si hay mensajes que desplegar -->
                 <!-- Obtenemos la categoría y el mensaje en los mensajes-->
                 {% for category, message in messages %}
-                <!-- category es una varible de python
-                 - Esta parte del código hace que la clase de este div cambie en función de la categoria del mensaje
-                -->
-                <div class="notification {{ category }}">
-                    {{ message }}
-                </div>
+                    <!-- category es una varible de python
+                     - Esta parte del código hace que la clase de este div cambie en función de la categoria del mensaje
+                    -->
+                    <div class="notification {{ category }}">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
@@ -74,8 +74,7 @@
                     <a href="{{ url_for('index') }}">Todos</a>
 
                     {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('stream', username=current_user.username) }}">Siguiendo</a>
-                    <a href="{{ url_for('post') }}" class="new">Nuevo Post</a>
+                        <a href="{{ url_for('post') }}" class="new">Nuevo Post</a>
                     {% endif %}
 
                 </nav>
@@ -93,7 +92,7 @@
 
             <div class="row">
 
-                <p>Todos los derechos reservados</a></p>
+                <p>Todos los derechos reservados</p>
 
             </div>
 

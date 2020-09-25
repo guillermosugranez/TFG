@@ -25,10 +25,8 @@ class User(UserMixin, Model):
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at",)
 
-
     # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
-    def get_posts(self):
-         # Primero coge todos, luego filtra al objeto que llama
+    def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
         return Post.select().where(Post.user == self)
 
     # Constructor
@@ -41,10 +39,10 @@ class User(UserMixin, Model):
     @classmethod
     def create_user(cls, username, email, password):
         try:
-            cls.create( # Crea un registro en la bbdd
+            cls.create(  # Crea un registro en la bbdd
                 username=username,
                 email=email,
-                password= generate_password_hash(password),
+                password=generate_password_hash(password),
             )
         except IntegrityError:
             pass
@@ -52,7 +50,7 @@ class User(UserMixin, Model):
 
 
 class Post(Model):
-    '''Pequeños mensajes que aparecen en el timeline de FaceSmash'''
+    """Pequeños mensajes que aparecen en el timeline de FaceSmash"""
 
     # Qué es lo que tiene un post?
     user = ForeignKeyField(  # Hace refencia a un usuario
@@ -71,7 +69,7 @@ class Post(Model):
 
 
 def initialize():
-    '''Crea las tablas del proyecto a partir de los modelos propuestos'''
+    """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
     DATABASE.connect()  # Establece la conexión
     DATABASE.create_tables([User], safe=True)

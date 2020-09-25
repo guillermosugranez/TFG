@@ -4,8 +4,8 @@
 # flash -> desplegar un mensaje después de la siguiente petición
 # url_for es para generar una url a un cierto endpoint
 from flask import Flask, g, render_template, flash, url_for, redirect
-from flask_login import LoginManager, login_user, logout_user, login_required
-from flask_login import current_user  # A partir de la vista de Post
+from flask_login import (LoginManager, login_user, logout_user, login_required,
+                         current_user)  # A partir de la vista de Post
 from flask_bcrypt import check_password_hash
 
 import models
@@ -28,12 +28,12 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(username):
+def load_user(userid):
     """Método para cargar el usuario qué esté logueado"""
 
     try:
-        # Devuelve el registro del usuario que tenga el mismo id que buscamos
-        return models.User.get(models.User.username == username)
+        # Devuelve el registro del usuario que tenga el mismo name que buscamos
+        return models.User.get(models.User.id == userid)
     except models.DoesNotExist:
         return None
 
@@ -52,11 +52,11 @@ def before_request():
 
     # Esta función verifica que el objeto g no tenga ya definido el atributo db
     # Esto evita errores al tratar de volver a definirlo.
-    if not hasattr(g, 'db'):
-        g.db = models.DATABASE  # La bbdd es la definida en el archivo models
+    # if not hasattr(g, 'db'):
+    g.db = models.DATABASE  # La bbdd es la definida en el archivo models
 
-    if not hasattr(g, 'user'):
-        g.user = current_user  # Usuario actual definido en flask
+    # if not hasattr(g, 'user'):
+    g.user = current_user  # Usuario actual definido en flask
 
     if g.db.is_closed():
         g.db.connect()
@@ -136,7 +136,8 @@ def post():
         # _get_current_object() te da el objeto real al que está referenciando
         # Esto lo tiene que hacer porque current_user es un proxy.
         # models.Post.create(user=g.user._get_current_object(),
-        models.Post.create(user=g.user,
+        # models.Post.create(user=g.user,
+        models.Post.create(user=g.user._get_current_object(),
                            content=form.content.data.strip())  # Quita espacios
         flash('Mensaje Posteado', 'success')
         return redirect(url_for('index'))

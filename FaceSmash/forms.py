@@ -8,23 +8,24 @@ import models
 
 
 def name_exists(form, field):
-    '''Controla que el usuario no esté ya creado'''
+    """Controla que el usuario no esté ya creado"""
 
-    if User.select().where(User.username == field.data).exists():
+    if models.User.select().where(models.User.username == field.data).exists():
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese nombre.")
 
 
 def email_exists(form, field):
-    '''Controla que el eMail no exista ya'''
+    """Controla que el eMail no exista ya"""
 
-    if User.select().where(User.email == field.data).exists():
+    if models.User.select().where(models.User.mail == field.data).exists():
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese eMail")
 
 # ==============================================================================
 
 # Cada campo en las clases, significa un campo en el HTML
+
 
 class RegisterForm(FlaskForm):
     username = StringField(
@@ -67,6 +68,6 @@ class LoginForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    '''Formulario para el contenido del Post. Hace falta escribir algo'''
+    """Formulario para el contenido del Post. Hace falta escribir algo"""
 
     content = TextAreaField('Qué piensas', validators=[DataRequired()])
