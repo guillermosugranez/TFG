@@ -147,9 +147,10 @@ def post():
 
 @app.route('/')
 def index():
-    """Vista principal"""
+    """Vista principal. Muestra un timeline con los post de diferentes users"""
 
-    return 'Hey'
+    stream = models.Post.select().limit(100)  # stream es el timeline
+    return render_template('stream.html', stream=stream)
 
 
 if __name__ == "__main__":
