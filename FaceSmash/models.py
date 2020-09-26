@@ -73,6 +73,22 @@ class Post(Model):
         order_by = ('-joined_at',)
 
 
+class Relationship(Model):
+    """ Representa que un usuario (from) sigue a otro (to)"""
+
+    from_user = ForeignKeyField(User, related_name='relationships')
+    to_user = ForeignKeyField(User, related_name='related_to')
+
+    class Meta:
+        database = DATABASE
+        # Atributo indexes. Sirve para:
+        # - Buscar más rápidamente en la bbdd
+        # - Definir relaciones únicas. No seguir a un mismo usuario más de 1 vez
+        indexes = (
+            (('from_user', 'to_user'), True)
+        )
+
+
 def initialize():
     """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
