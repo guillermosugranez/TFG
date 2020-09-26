@@ -3,7 +3,8 @@
 # Para la ocasión, se usará para los métodos before y after request
 # flash -> desplegar un mensaje después de la siguiente petición
 # url_for es para generar una url a un cierto endpoint
-from flask import Flask, g, render_template, flash, url_for, redirect
+# abort te permite salir de la vista actual
+from flask import Flask, g, render_template, flash, url_for, redirect, abort
 from flask_login import (LoginManager, login_user, logout_user, login_required,
                          current_user, AnonymousUserMixin)
 from flask_bcrypt import check_password_hash
@@ -222,7 +223,8 @@ def index():
 @app.route('/stream')  # timeline del usuario que ha iniciado sesión
 @app.route('/stream/<username>')  # timeline de un usuario específico
 def stream(username=None):
-    """Muestra hasta 100 post
+    """
+    Muestra hasta 100 post
     - Cuando no se le proporciona nombre de usuario, te muestra el general
     - Cuando se le proporciona un nombre te muestra solo los de ese usuario
     """
@@ -230,11 +232,15 @@ def stream(username=None):
     template = 'stream.html'  # Para el usuario que ha iniciado sesión
     if username and username != current_user.username:
         # Si es otro usuario diferente que le que ha iniciado sesión
+        try:
 
-        # El ** sirve para hacer like. Ignora mayúsculas y minúsculas
-        # .get() solo te da un registro, una instancia
-        user = models.User.select().where(models.User.username**username).get()
-        s = user.posts.limit(100)
+            # El ** sirve para hacer like. Ignora mayúsculas y minúsculas
+            # .get() solo te da un registro, una instancia
+            user = models.User.select().where(models.User.username**username).get()
+        except models.DoesNotExist:
+            abort(404)  # Despliega el código de error (404) al usuario
+        else:  # Si no ocurre la excepción
+            s = user.posts.limit(100)
     else:
         # Si el usuario es el mismo que ha iniciado sesión
         s = current_user.get_stream().limit(100)
@@ -243,6 +249,10 @@ def stream(username=None):
         template = 'user_stream.html'  # Para otro usuario
     return render_template(template, stream=s, user=user)
 
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html')
 
 if __name__ == "__main__":
     """Función principal del proyecto. LLama a los demás métodos"""
