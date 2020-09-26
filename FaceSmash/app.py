@@ -87,6 +87,8 @@ def view_post(post_id):
 
     # El Post.id es automático. Se genera cuando se crea el registro
     s = models.Post.select().where(models.Post.id == post_id)
+    if s.count() == 0:
+        abort(404)
     return render_template('stream.html', stream=s)
 
 
@@ -99,7 +101,7 @@ def follow(username):
         # Coges al usuario que quieres seguir
         to_user = models.User.get(models.User.username**username)
     except models.DoesNotExist:  # En caso de que no lo encuentre
-        pass
+        abort(404)
     else:  # Si se encuentra el usuario que queremos seguir en la bd...
         try:  # Se crea la relación
             models.Relationship.create(
@@ -107,7 +109,7 @@ def follow(username):
                 to_user=to_user
             )
         except models.IntegrityError:  # La relación ya se ha creado antes
-            pass
+            abort(404)
         else:
             flash('Ahora sigues a {}'.format(to_user.username), 'success')
     # Redirige al stream (los post) del usuario que hemos seguido
@@ -123,7 +125,7 @@ def unfollow(username):
         # Coges al usuario que quieres dejar de seguir
         to_user = models.User.get(models.User.username**username)
     except models.DoesNotExist:  # En caso de que no lo encuentre
-        pass
+        abort(404)
     else:  # Si se encuentra el usuario que queremos seguir en la bd...
         try:  # Se crea la relación
             models.Relationship.get(  # Coges el registro de esta persona
@@ -131,7 +133,7 @@ def unfollow(username):
                 to_user=to_user
             ).delete_instance()
         except models.IntegrityError:  # La relación ya se ha creado antes
-            pass
+            abort(404)
         else:
             flash('Has dejado de seguir a {}'.format(to_user.username),
                   'success')
