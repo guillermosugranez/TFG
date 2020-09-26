@@ -72,6 +72,15 @@ def after_request(response):  # response es la respuesta a la petición
     return response
 
 
+@app.route('/post/<int:post_id>')
+def view_post(post_id):
+    """Te permite consultar un post dado su id"""
+
+    # El Post.id es automático. Se genera cuando se crea el registro
+    s = models.Post.select().where(models.Post.id == post_id)
+    return render_template('stream.html', stream=s)
+
+
 @app.route('/follow/<username>')
 @login_required
 def follow(username):

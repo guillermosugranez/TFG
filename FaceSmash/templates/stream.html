@@ -13,7 +13,7 @@
             <!--Timeline general-->
             <i class="clock"></i><!-- La i sirve para dar información al javascript -->
             <time data-time="{{post.timestamp}}" class="distime" datetime = "{{ post.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}">"{{ post.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</time>
-            <a href="#" class="view">Ver</a>
+            <a href="{{ url_for('view_post', post_id=post.id) }}" class="view">Ver</a>
             <div class="post">
                 {{ post.content }}
             </div>
