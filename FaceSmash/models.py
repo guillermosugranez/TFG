@@ -29,7 +29,7 @@ class User(UserMixin, Model):
     def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
         return Post.select().where(Post.user == self)
 
-    def get_stream(self):  # Primero coge todos, luego filtra al objeto que llama
+    def get_stream(self):  # 1º coge todos, luego filtra al objeto que llama
         return Post.select().where(Post.user == self)
 
     # Constructor
@@ -42,14 +42,16 @@ class User(UserMixin, Model):
     @classmethod
     def create_user(cls, username, email, password):
         try:
-            cls.create(  # Crea un registro en la bbdd
-                username=username,
-                email=email,
-                password=generate_password_hash(password),
-            )
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    username=username,
+                    email=email,
+                    password=generate_password_hash(password),
+                )
         except IntegrityError:
-            pass
-            # raise ValueError("User Already exists")
+            raise ValueError("User Already exists")
 
 
 class Post(Model):

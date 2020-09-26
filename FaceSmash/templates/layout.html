@@ -74,6 +74,9 @@
                     <a href="{{ url_for('index') }}">Todos</a>
 
                     {% if current_user.is_authenticated %}
+                        <!--Botón de siguiendo-->
+                        <a href="{{ url_for('stream', username=current_user.username)}}">Siguiendo</a>
+                        <!--Botón de Nuevo post-->
                         <a href="{{ url_for('post') }}" class="new">Nuevo Post</a>
                     {% endif %}
 

@@ -149,41 +149,47 @@ def post():
 def index():
     """Vista principal. Muestra un timeline con los post de diferentes users"""
 
-    stream = models.Post.select().limit(100)  # stream es el timeline
-    return render_template('stream.html', stream=stream)
+    s = models.Post.select().limit(100)  # stream es el timeline
+    return render_template('stream.html', stream=s)
 
 
-@app.route('/stream')
-@app.route('/stream/<username>')
+@app.route('/stream')  # timeline del usuario que ha iniciado sesión
+@app.route('/stream/<username>')  # timeline de un usuario específico
 def stream(username=None):
     """Muestra hasta 100 post
     - Cuando no se le proporciona nombre de usuario, te muestra el general
     - Cuando se le proporciona un nombre te muestra solo los de ese usuario
     """
 
-    template = 'stream.html'
+    template = 'stream.html'  # Para el usuario que ha iniciado sesión
     if username and username != current_user.username:
+        # Si es otro usuario diferente que le que ha iniciado sesión
+
         # El ** sirve para hacer like. Ignora mayúsculas y minúsculas
         # .get() solo te da un registro, una instancia
         user = models.User.select().where(models.User.username**username).get()
-        stream = user.posts.limit(100)
+        s = user.posts.limit(100)
     else:
-        stream = current_user.get_stream().limit(100)
+        # Si el usuario es el mismo que ha iniciado sesión
+        s = current_user.get_stream().limit(100)
         user = current_user
     if username:
-        template = 'user_stream.html'
-    return render_template(template, stream=stream, user=user)
+        template = 'user_stream.html'  # Para otro usuario
+    return render_template(template, stream=s, user=user)
 
 
 if __name__ == "__main__":
     """Función principal del proyecto. LLama a los demás métodos"""
-    
+
     models.initialize()
-    models.User.create_user(
-        username='Guille',
-        email='guillecor91@gmail.com',
-        password="1234"  # Tiene que ser una cadena
-    )
+    try:
+        models.User.create_user(
+            username='Guille',
+            email='guillecor91@gmail.com',
+            password="1234"  # Tiene que ser una cadena
+        )
+    except ValueError:  # Si el usuario ya está en la bbdd
+        pass
 
     app.run(debug=DEBUG, host=HOST, port=PORT)
 
