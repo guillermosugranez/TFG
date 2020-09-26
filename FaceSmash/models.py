@@ -32,6 +32,29 @@ class User(UserMixin, Model):
     def get_stream(self):  # 1º coge todos, luego filtra al objeto que llama
         return Post.select().where(Post.user == self)
 
+    def following(self):
+        """Los usuarios que estamos siguiendo"""
+
+        return (
+            User.select().join( # Se usa el join porque se usan varias tablas
+                Relationship, on=Relationship.to_user  # Todos los usuarios
+            ).where(
+                Relationship.from_user == self # A los que sigue el actual user
+            )
+        )
+
+    def followers(self):
+        """Los usuarios que nos siguen"""
+
+        return (
+            User.select().join(  # Se usa el join porque se usan varias tablas
+                Relationship, on=Relationship.from_user  # Todos los usuarios
+            ).where(
+                Relationship.to_user == self  # A los que sigue el actual user
+            )
+        )
+
+
     # Constructor
     # cls hace que el método sea de la misma clase, y no de la instancia
     # Esto es aconsejable por legibilidad entre otras cuestiones (PEP8)
