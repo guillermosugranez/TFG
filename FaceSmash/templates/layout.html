@@ -25,9 +25,12 @@
                     <!-- Dar la Bienvenida -->
                     <h1>
                         Hola
-                        {% if current_user.is_authenticated %}
+                        <!--{% if current_user.is_authenticated %}
                             {{ current_user.username }}!
-                        {% endif %}
+                        {% endif %}-->
+
+                        <!--A partir de la creación del usuario invitado-->
+                        {{ current_user.username }}!
                     </h1>
                 </div>
                 <div class="grid-33">

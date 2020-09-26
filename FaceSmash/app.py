@@ -5,7 +5,7 @@
 # url_for es para generar una url a un cierto endpoint
 from flask import Flask, g, render_template, flash, url_for, redirect
 from flask_login import (LoginManager, login_user, logout_user, login_required,
-                         current_user)  # A partir de la vista de Post
+                         current_user, AnonymousUserMixin)
 from flask_bcrypt import check_password_hash
 
 import models
@@ -20,11 +20,19 @@ app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnv´lsjdAsCaxcAv'  # Llave Secreta.
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
+# Usuario Invitado
+class Anonymous(AnonymousUserMixin):
+    def __init__(self):
+        self.username = 'Invitado'
+
 login_manager = LoginManager()  # Se crea una variable donde alojarlo
 login_manager.init_app(app)  # Login manager va a controlar las sesiones de app
 
 # Qué vista mostrar cuando el usuario quiera loguearse o sea redirigido
 login_manager.login_view = 'login'
+login_manager.anonymous_user = Anonymous  # El usuario es la propia clase
+
+
 
 
 @login_manager.user_loader
