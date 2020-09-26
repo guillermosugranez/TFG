@@ -72,6 +72,55 @@ def after_request(response):  # response es la respuesta a la petición
     return response
 
 
+@app.route('/follow/<username>')
+@login_required
+def follow(username):
+    """Crea una nueva relación (Nueva entrada en la tabla Relationship)"""
+
+    try:
+        # Coges al usuario que quieres seguir
+        to_user = models.User.get(models.User.username**username)
+    except models.DoesNotExist:  # En caso de que no lo encuentre
+        pass
+    else:  # Si se encuentra el usuario que queremos seguir en la bd...
+        try:  # Se crea la relación
+            models.Relationship.create(
+                from_user=g.user._get_current_object(),
+                to_user=to_user
+            )
+        except models.IntegrityError:  # La relación ya se ha creado antes
+            pass
+        else:
+            flash('Ahora sigues a {}'.format(to_user.username), 'success')
+    # Redirige al stream (los post) del usuario que hemos seguido
+    return redirect(url_for('stream', username=to_user.username))
+
+
+@app.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    """Borra una relación existente"""
+
+    try:
+        # Coges al usuario que quieres dejar de seguir
+        to_user = models.User.get(models.User.username**username)
+    except models.DoesNotExist:  # En caso de que no lo encuentre
+        pass
+    else:  # Si se encuentra el usuario que queremos seguir en la bd...
+        try:  # Se crea la relación
+            models.Relationship.get(  # Coges el registro de esta persona
+                from_user=g.user._get_current_object(),
+                to_user=to_user
+            ).delete_instance()
+        except models.IntegrityError:  # La relación ya se ha creado antes
+            pass
+        else:
+            flash('Has dejado de seguir a {}'.format(to_user.username),
+                  'success')
+    # Redirige al stream (los post) del usuario que hemos seguido
+    return redirect(url_for('stream', username=to_user.username))
+
+
 @app.route('/register', methods=('GET', 'POST'))  # Métodos HTTP usados aquí
 def register():
     """Vista para registrar un usuario"""
