@@ -108,7 +108,7 @@ class Relationship(Model):
         # - Buscar más rápidamente en la bbdd
         # - Definir relaciones únicas. No seguir a un mismo usuario más de 1 vez
         indexes = (
-            (('from_user', 'to_user'), True)
+            (('from_user', 'to_user'), True),
         )
 
 
@@ -116,7 +116,7 @@ def initialize():
     """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
     DATABASE.connect()  # Establece la conexión
-    DATABASE.create_tables([User, Post], safe=True)
+    DATABASE.create_tables([User, Post, Relationship], safe=True)
     DATABASE.close()  # Se cierra
 
 # -----------------------------------------------------------------------------
