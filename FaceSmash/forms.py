@@ -18,7 +18,7 @@ def name_exists(form, field):
 def email_exists(form, field):
     """Controla que el eMail no exista ya"""
 
-    if models.User.select().where(models.User.mail == field.data).exists():
+    if models.User.select().where(models.User.email == field.data).exists():
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese eMail")
 

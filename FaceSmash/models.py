@@ -29,11 +29,18 @@ class User(UserMixin, Model):
     def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
         return Post.select().where(Post.user == self)
 
-    def get_stream(self):  # 1º coge todos, luego filtra al objeto que llama
-        return Post.select().where(Post.user == self)
+    def get_stream(self):
+        """Mostrar los post míos y de la gente que sigo"""
+
+        # Devuelve todos los post
+        return Post.select().where(  # de...
+            # Un usuario que se encuentra en la lista de los que sigue
+            (Post.user << self.following()) |
+            (Post.user == self)  # ó del mismo usuario
+        )
 
     def following(self):
-        """Los usuarios que estamos siguiendo"""
+        """Los usuarios que sigue el usuario actual"""
 
         return (
             User.select().join( # Se usa el join porque se usan varias tablas
