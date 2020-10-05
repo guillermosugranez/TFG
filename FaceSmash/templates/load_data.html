@@ -1,0 +1,10 @@
+{% from 'macros.html' import render_field %}
+{% extends "layout.html" %}
+
+{% block content %}
+    <form action="" method=post enctype=multipart/form-data>
+        {{ form.hidden_tag() }} <!-- Esto es solo para que no hacken -->
+        <input type=file name=file>
+        <button type="submit" id="submit value=Upload">Subir Datos</button>
+    </form>
+{% endblock %}

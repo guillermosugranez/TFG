@@ -27,8 +27,25 @@ def make_dataset(folder_name):
 
     return pd.concat(dataframes)
 
+
+
+
+
+def process_data(filename):
+    """
+    Dado el nombre de un archivo excel, cargar sus datos en la bd.
+    El formato debe ser adecuado
+    Debe
+    """
+    name, extension = os.path.splitext(filename)
+    if extension == ".xlsx":  # Solo archivos excel
+        data = pd.read_excel(filename)
+
+    return data
+
+
 if __name__ == "__main__":
     """Making Dataset"""
 
-    dataset = make_dataset("Tables")  # Se le pasa el nombre de la carpeta
+    dataset = make_dataset("import_data")  # Se le pasa el nombre de la carpeta
     print(dataset)

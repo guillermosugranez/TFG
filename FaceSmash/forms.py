@@ -1,11 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, FileField
 from wtforms.validators import (  # Validadores para los formularios
     DataRequired, ValidationError, Email, Regexp, Length, EqualTo
 )
 
 import models
-
 
 def name_exists(form, field):
     """Controla que el usuario no esté ya creado"""
@@ -21,6 +20,11 @@ def email_exists(form, field):
     if models.User.select().where(models.User.email == field.data).exists():
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese eMail")
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ==============================================================================
 
@@ -71,3 +75,11 @@ class PostForm(FlaskForm):
     """Formulario para el contenido del Post. Hace falta escribir algo"""
 
     content = TextAreaField('Qué piensas', validators=[DataRequired()])
+
+
+class LoadDataForm(FlaskForm):
+    """Formulario para introducir datos a partir de una tabla"""
+
+    file = FileField('Selecciona un fichero', validators=[DataRequired()])
+
+

@@ -24,7 +24,8 @@
                 <div class="grid-33">
                     <!-- Dar la Bienvenida -->
                     <h1>
-                        Hola
+                        <!-- De qué va la página (Título de la aplicación-->
+                        Poultry Geek
                         <!--{% if current_user.is_authenticated %}
                             {{ current_user.username }}!
                         {% endif %}-->
@@ -69,11 +70,8 @@
         {% endwith %}
 
         <div class="row">
-
             <div class="main">
-
                 <nav>
-
                     <a href="{{ url_for('index') }}">Todos</a>
 
                     {% if current_user.is_authenticated %}
@@ -91,7 +89,6 @@
                 {% block content %}{% endblock %}
 
             </div>
-
         </div>
 
         <footer>
