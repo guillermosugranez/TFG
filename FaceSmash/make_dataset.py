@@ -28,9 +28,6 @@ def make_dataset(folder_name):
     return pd.concat(dataframes)
 
 
-
-
-
 def process_data(filename):
     """
     Dado el nombre de un archivo excel, cargar sus datos en la bd.

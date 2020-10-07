@@ -9,10 +9,16 @@ from flask import (Flask, g, render_template, flash, url_for, redirect, abort,
 from flask_login import (LoginManager, login_user, logout_user, login_required,
                          current_user, AnonymousUserMixin)
 from flask_bcrypt import check_password_hash
+
+# Importar archivos
 from werkzeug.utils import secure_filename
 import os
-
 from make_dataset import process_data
+
+# Web de administración
+from flask_admin import Admin
+from flask_admin.contrib.peewee import ModelView
+from datetime import datetime
 
 import models
 import forms  # LoginForm, RegisterForm
@@ -25,7 +31,19 @@ ALLOWED_EXTENSIONS = {'xlsx'}
 
 app = Flask(__name__)  # Se instancia la aplicación
 app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnv´lsjdAsCaxcAv'  # Llave Secreta.
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Administración
+app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'  # Tema para la administracion
+admin = Admin(app, name='Poultry Geek', template_mode='bootstrap3')
+
+def admin_loader():
+    admin.add_view(ModelView(models.User))
+    admin.add_view(ModelView(models.Integrado))
+    admin.add_view(ModelView(models.Camada))
+
+
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
@@ -40,8 +58,6 @@ login_manager.init_app(app)  # Login manager va a controlar las sesiones de app
 # Qué vista mostrar cuando el usuario quiera loguearse o sea redirigido
 login_manager.login_view = 'login'
 login_manager.anonymous_user = Anonymous  # El usuario es la propia clase
-
-
 
 
 @login_manager.user_loader
@@ -305,6 +321,7 @@ def dataset_to_bd(dataframe):
 def load_data():
     """Permite cargar datos a la bbdd usando el formulario correspondiente"""
 
+
     form = forms.LoadDataForm()
 
     if form.validate_on_submit():
@@ -396,6 +413,7 @@ if __name__ == "__main__":
     except ValueError:  # Si el usuario ya está en la bbdd
         pass
 
+    admin_loader()
     app.run(debug=DEBUG, host=HOST, port=PORT)
 
 # -----------------------------------------------------------------------------
