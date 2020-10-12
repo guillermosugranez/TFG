@@ -4,10 +4,25 @@
 # flash -> desplegar un mensaje después de la siguiente petición
 # url_for es para generar una url a un cierto endpoint
 # abort te permite salir de la vista actual
-from flask import Flask, g, render_template, flash, url_for, redirect, abort
+from flask import (Flask, g, render_template, flash, url_for, redirect, abort,
+                   request)
 from flask_login import (LoginManager, login_user, logout_user, login_required,
                          current_user, AnonymousUserMixin)
 from flask_bcrypt import check_password_hash
+
+# Importar archivos
+from werkzeug.utils import secure_filename
+import os
+from make_dataset import process_data
+
+# Web de administración
+from flask_admin import Admin
+from flask_admin.contrib.peewee import ModelView
+
+# Tablas
+import pandas as pd
+import sqlite3
+
 
 import models
 import forms  # LoginForm, RegisterForm
@@ -15,9 +30,24 @@ import forms  # LoginForm, RegisterForm
 DEBUG = True  # Mayúsculas indica que es global (por convenio)
 PORT = 8000
 HOST = '0.0.0.0'
+UPLOAD_FOLDER = os.getcwd() + '/make_dataset/import_data'
+ALLOWED_EXTENSIONS = {'xlsx'}
 
 app = Flask(__name__)  # Se instancia la aplicación
 app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnv´lsjdAsCaxcAv'  # Llave Secreta.
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Administración
+app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'  # Tema para la administracion
+admin = Admin(app, name='Poultry Geek', template_mode='bootstrap3')
+
+def admin_loader():
+    admin.add_view(ModelView(models.User))
+    admin.add_view(ModelView(models.Integrado))
+    admin.add_view(ModelView(models.Camada))
+
+
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
@@ -32,8 +62,6 @@ login_manager.init_app(app)  # Login manager va a controlar las sesiones de app
 # Qué vista mostrar cuando el usuario quiera loguearse o sea redirigido
 login_manager.login_view = 'login'
 login_manager.anonymous_user = Anonymous  # El usuario es la propia clase
-
-
 
 
 @login_manager.user_loader
@@ -170,14 +198,14 @@ def login():
             # Query en busca del registro cuyo eMail es el escrito en el form
             user = models.User.get(models.User.email == form.email.data)
         except models.DoesNotExist:  # No existe ese usuario
-            flash('Tu nombre de usuario o contraseña no existe', 'error')
+            flash('Tu nombre de usuario o contraseña no existe', 'danger')
         else:  # Si el usuario si existe hay que comprobar su contraseña
             if check_password_hash(user.password, form.password.data):
                 login_user(user)  # Se loguea con la librería de flask
                 flash('Has iniciado sesión', 'success')
                 return redirect(url_for('index'))
             else:
-                flash('Tu nombre de usuario o contraseña no existe', 'error')
+                flash('Tu nombre de usuario o contraseña no existe', 'danger')
 
     return render_template('login.html', form=form)  # Usa macro para render
 
@@ -214,12 +242,133 @@ def post():
     return render_template('post.html', form=form)
 
 
+def allowed_file(filename):
+    """Comprueba si la extension del archivo es válida"""
+
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def dataset_to_bd(dataframe):
+    """Procesa la información de un dataset y trata de guardarla en la bbdd"""
+
+    d = dataframe.to_dict('index')
+
+    i=0
+    for registro in d:
+        print(i, d[registro])
+        # Se crea el integrado
+        models.Integrado.create_integrado(
+            user=g.user._get_current_object(),
+            tecnico=d[registro]['Técnico'],
+            fabrica=d[registro]['Fab. Pienso'],
+            codigo=d[registro]['Código'],
+            avicultor=d[registro]['Avicultor'],
+            poblacion=d[registro]['Población'],
+            provincia=d[registro]['Provincia'],
+            ditancia=d[registro]['Distancia a Matadero Purullena'],
+            metros_cuadrados=d[registro]['Mts Cuadrados'],
+        )
+
+        # Cojo el integrado que ya está en bbdd
+        integrado = models.Integrado.get(
+            models.Integrado.codigo**
+            d[registro]['Código'])
+
+        print(integrado)
+
+        # Se crea la camada
+        models.Camada.create_camada(
+            integrado=integrado,
+            codigo_camada=d[registro]['Código Camada'],
+            medicamentos=d[registro]['MEDICAMENTOS'],
+            liquidacion=d[registro]['LIQUIDACIÓN'],
+            pollos_entrados=d[registro]['Pollos Entrados'],
+            pollos_salidos=d[registro]['Pollos Salidos'],
+            porcentaje_bajas=d[registro]['% Bajas'],
+            bajas_primera_semana=d[registro]['BAJAS 1a. SEMANA'],
+            porcentaje_bajas_primera_semana=d[registro]['%BAJAS 1a. Semana'],
+            kilos_carne=d[registro]['Kilos Carne'],
+            kilos_pienso=d[registro]['Kilos Pienso'],
+            peso_medio=d[registro]['Peso Medio'],
+            indice_transformacion=d[registro]['I.Transform'],
+            retribucion=d[registro]['Retribución Pollo'],
+            medicamentos_por_pollo=d[registro]['Medic/Pollo'],
+            rendimiento_metro_cuadrado=d[registro]['Rdto/M2'],
+            pollo_metro_cuadrado=d[registro]['Pollo/Mt2'],
+            kilos_consumidos_por_pollo_salido=d[registro]['Kilos Consumidos por Pollo Salido'],
+            dias_media_retirada=d[registro]['Dias Media Retirada sin Asador'],
+            ganancia_media_diaria=d[registro]['Ganancia Media Diaria'],
+            dias_primer_camion=d[registro]['Días Primer Camión'],
+            peso_primer_dia=d[registro]['Peso 1 Día'],
+            peso_semana_1=d[registro]['Peso 1 Semana'],
+            peso_semana_2=d[registro]['peso 2 semana'],
+            peso_semana_3=d[registro]['peso 3 semana'],
+            peso_semana_4=d[registro]['peso 4 semana'],
+            peso_semana_5=d[registro]['peso 5 semana'],
+            peso_semana_6=d[registro]['peso 6 semana'],
+            peso_semana_7=d[registro]['peso 7 semana'],
+            fecha=d[registro]['FECHA'],
+            rendimiento=d[registro]['Rendimiento'],
+            FP=d[registro]['%  FP'],
+            bajas_matadero=d[registro]['Bajas'],
+            decomisos_matadero=d[registro]['Decomisos'],
+            porcentaje_bajas_matadero=d[registro]['% Bajas'],
+            porcentaje_decomisos=d[registro]['% Decomisos'],
+        )
+        i = i+1
+
+    return True
+
+
+@app.route('/load_data', methods=('GET', 'POST'))
+@login_required  # Puede haber más de un decorador. Este requiere estar logado
+def load_data():
+    """Permite cargar datos a la bbdd usando el formulario correspondiente"""
+
+
+    form = forms.LoadDataForm()
+
+    if form.validate_on_submit():
+        if request.method == 'POST':
+            # check if the post request has the file part
+            if 'file' not in request.files:
+                flash('No file part', 'danger')
+                return redirect(request.url)
+            file = request.files['file']
+            # if user does not select file, browser also
+            # submit an empty part without filename
+            if file.filename == '':
+                flash('No selected file', "danger")
+                return redirect(request.url)
+            if file:
+                if allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'],
+                                           filename))
+                    # Una vez cargados en el servidor, hay que procesarlos
+                    dataframe = process_data(
+                        os.path.join(app.config['UPLOAD_FOLDER'],
+                        filename))
+                    # Ahora se carga en la bd
+                    if dataset_to_bd(dataframe):
+                        flash("Datos cargados con éxito", "success")
+                        return redirect(url_for('index'))  # Si todo...
+                    else:
+                        flash('No se pudieron procesar los datos', "danger")
+                    # va bien vuelve al index
+                else:
+                    flash('Extensión de fichero no válida', 'danger')
+
+    return render_template('load_data.html', form=form)  # Vuelve a intentarlo
+
+
 @app.route('/')
 def index():
     """Vista principal. Muestra un timeline con los post de diferentes users"""
 
-    s = models.Post.select().limit(100)  # stream es el timeline
-    return render_template('stream.html', stream=s)
+    # s = models.Post.select().limit(100)  # stream es el timeline
+    # return render_template('stream.html', stream=s)
+    return render_template('index.html')
 
 
 @app.route('/stream')  # timeline del usuario que ha iniciado sesión
@@ -252,6 +401,49 @@ def stream(username=None):
     return render_template(template, stream=s, user=user)
 
 
+def search_function():
+    """Devuelve un dataframe con la consulta realizada"""
+
+    cnx = sqlite3.connect('social.db')
+    df_query = pd.read_sql_query("SELECT * FROM camada", cnx)
+
+    return df_query
+
+@app.route('/table')  # timeline de un usuario específico
+def show_table():
+    """
+    Muestra hasta 100 post
+    - Cuando no se le proporciona nombre de usuario, te muestra el general
+    - Cuando se le proporciona un nombre te muestra solo los de ese usuario
+    """
+
+    user = current_user
+    # s = current_user.get_integrado().limit(100)
+
+    # table = pd.DataFrame({'name': ['Somu', 'Kiku', 'Amol', 'Lini', 'Guille'],
+    #                          'physics': [68, 74, 77, 78, 56],
+    #                          'chemistry': [84, 56, 73, 69, 48],
+    #                          'algebra': [78, 88, 82, 87, 98]})
+
+    table = search_function()
+
+    elementos_cabecera = []
+    elementos_fila = []
+
+    for llave in table:
+        elementos_cabecera.append(llave)
+
+    for i in table.index:
+        lista_auxiliar = []
+        for campo in elementos_cabecera:
+            print(table[campo][i])
+            lista_auxiliar.append(table[campo][i])
+
+        elementos_fila.append(lista_auxiliar)
+
+    return render_template('table.html', elementos_cabecera=elementos_cabecera, elementos_fila=elementos_fila ,user=user)
+
+
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
@@ -269,6 +461,7 @@ if __name__ == "__main__":
     except ValueError:  # Si el usuario ya está en la bbdd
         pass
 
+    admin_loader()
     app.run(debug=DEBUG, host=HOST, port=PORT)
 
 # -----------------------------------------------------------------------------

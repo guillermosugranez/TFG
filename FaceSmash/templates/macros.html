@@ -1,12 +1,17 @@
 {% macro render_field(field) %} <!--Renderiza campos de formularios-->
     <div class="field">
-        {% if field.errors %}
-            {% for error in field.errors %}
-                <div class="notification error">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        {% endif %}
-        {{ field(placeholder=field.label.text) }} <!--Aquí muestra el campo de texto que hay por cada elemento del registerform-->
+        <div class="form-group">
+            {% if field.label.text != 'CSRF Token' %}
+            <label for="{{ field.id }}" class="text-info text-dark">{{ field.label.text }}:</label><br>
+            {% endif %}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    <div class="notification error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {{ field(class_="form-control") }} <!--Aquí muestra el campo de texto que hay por cada elemento del registerform-->
+        </div>
     </div>
 {% endmacro %}

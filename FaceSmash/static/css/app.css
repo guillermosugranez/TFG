@@ -1,0 +1,12 @@
+/*Esto permite restablecer por defecto cualquier elemento*/
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Lato', sans-serif;
+}
+

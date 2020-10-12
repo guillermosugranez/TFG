@@ -1,0 +1,32 @@
+#login {
+    height: 100%;
+    width: 40%;
+}
+
+#login-box-start {
+    width: 100%;
+    height: 15%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#login-box {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    padding: 10%;
+    background: #EAEAEA;
+}
+
+#login-box-end {
+    width: 100%;
+    height: 35%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

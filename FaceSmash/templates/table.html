@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container-fluid" id="table-main-container">
+    <div class="container-fluid border border-dark rounded" id="table-container-00">
+        <div class="container-fluid" id="table-container-00-search">
+            <p>search</p>
+        </div>
+        <div class="container-fluid border" id="table-container-00-table">
+
+            <table id="table_id" class="display">
+                <thead>
+                    <tr>
+                        {% for campo in elementos_cabecera %}
+                            <th>{{ campo }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in elementos_fila %}
+                        <tr>
+                            {% for elemento in fila %}
+                                <td>{{ elemento }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container-fluid border border-dark rounded" id="table-container-01">
+        <p>01</p>
+    </div>
+</div>
+
+{% endblock %}
+
+<table id="table_id" class="display">
+    <thead>
+        <tr>
+            <th>Column 1</th>
+            <th>Column 2</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Row 1 Data 1</td>
+            <td>Row 1 Data 2</td>
+        </tr>
+        <tr>
+            <td>Row 1 Data 1</td>
+            <td>Row 1 Data 2</td>
+        </tr>
+        <tr>
+            <td>Row 1 Data 1</td>
+            <td>Row 1 Data 2</td>
+        </tr>
+        <tr>
+            <td>Row 1 Data 1</td>
+            <td>Row 1 Data 2</td>
+        </tr>
+    </tbody>
+</table>

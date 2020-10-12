@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="66952eed-24d7-4802-b7d3-76782ad81b72" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1i9ZTWvrF4A7REuRrvpiKeKZjdx" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Documentos/pycharm/src/dict/spanish.dic" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/FaceSmash/static" />
+      <recent name="$PROJECT_DIR$/FaceSmash" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.app">
+    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TFG" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/FaceSmash" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/FaceSmash/app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="make_dataset" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="TFG" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/make_dataset" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/make_dataset/make_dataset.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.app" />
+        <item itemvalue="Python.make_dataset" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="1" Folder0="$PROJECT_DIR$/../Documentos/pycharm/src/dict" CustomDictionaries="1" CustomDictionary0="$PROJECT_DIR$/../Documentos/pycharm/src/dict/spanish.dic" DefaultDictionary="project-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="66952eed-24d7-4802-b7d3-76782ad81b72" name="Default Changelist" comment="" />
+      <created>1601321777269</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1601321777269</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="647" y="313" width="617" height="348" key="#Notifications" timestamp="1601364590550">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state x="647" y="313" width="617" height="348" key="#Notifications/0.28.1920.919@0.28.1920.919" timestamp="1601364590550" />
+    <state x="418" y="140" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1602070445090">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state x="418" y="138" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.28.1920.904@0.28.1920.904" timestamp="1601734696280" />
+    <state x="418" y="140" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.28.1920.919@0.28.1920.919" timestamp="1602070445090" />
+    <state x="739" y="241" width="426" height="482" key="FileChooserDialogImpl" timestamp="1601628250056">
+      <screen x="0" y="28" width="1920" height="904" />
+    </state>
+    <state x="739" y="241" key="FileChooserDialogImpl/0.28.1920.904@0.28.1920.904" timestamp="1601628250056" />
+    <state x="739" y="245" width="426" height="482" key="FileChooserDialogImpl/0.28.1920.919@0.28.1920.919" timestamp="1601364183571" />
+    <state width="807" height="471" key="GridCell.Tab.0.bottom" timestamp="1602537215249">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state width="607" height="464" key="GridCell.Tab.0.bottom/0.28.1920.884@0.28.1920.884" timestamp="1601819548799" />
+    <state width="602" height="476" key="GridCell.Tab.0.bottom/0.28.1920.894@0.28.1920.894" timestamp="1601556948988" />
+    <state width="607" height="477" key="GridCell.Tab.0.bottom/0.28.1920.904@0.28.1920.904" timestamp="1601752581327" />
+    <state width="807" height="471" key="GridCell.Tab.0.bottom/0.28.1920.919@0.28.1920.919" timestamp="1602537215249" />
+    <state width="807" height="471" key="GridCell.Tab.0.center" timestamp="1602537215248">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state width="607" height="464" key="GridCell.Tab.0.center/0.28.1920.884@0.28.1920.884" timestamp="1601819548797" />
+    <state width="602" height="476" key="GridCell.Tab.0.center/0.28.1920.894@0.28.1920.894" timestamp="1601556948986" />
+    <state width="607" height="477" key="GridCell.Tab.0.center/0.28.1920.904@0.28.1920.904" timestamp="1601752581326" />
+    <state width="807" height="471" key="GridCell.Tab.0.center/0.28.1920.919@0.28.1920.919" timestamp="1602537215248" />
+    <state width="807" height="471" key="GridCell.Tab.0.left" timestamp="1602537215247">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state width="607" height="464" key="GridCell.Tab.0.left/0.28.1920.884@0.28.1920.884" timestamp="1601819548795" />
+    <state width="602" height="476" key="GridCell.Tab.0.left/0.28.1920.894@0.28.1920.894" timestamp="1601556948985" />
+    <state width="607" height="477" key="GridCell.Tab.0.left/0.28.1920.904@0.28.1920.904" timestamp="1601752581325" />
+    <state width="807" height="471" key="GridCell.Tab.0.left/0.28.1920.919@0.28.1920.919" timestamp="1602537215247" />
+    <state width="807" height="471" key="GridCell.Tab.0.right" timestamp="1602537215248">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state width="607" height="464" key="GridCell.Tab.0.right/0.28.1920.884@0.28.1920.884" timestamp="1601819548798" />
+    <state width="602" height="476" key="GridCell.Tab.0.right/0.28.1920.894@0.28.1920.894" timestamp="1601556948987" />
+    <state width="607" height="477" key="GridCell.Tab.0.right/0.28.1920.904@0.28.1920.904" timestamp="1601752581326" />
+    <state width="807" height="471" key="GridCell.Tab.0.right/0.28.1920.919@0.28.1920.919" timestamp="1602537215248" />
+    <state x="175" y="81" key="SettingsEditor" timestamp="1601920559859">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state x="455" y="128" key="SettingsEditor/0.28.1920.904@0.28.1920.904" timestamp="1601726540786" />
+    <state x="175" y="81" key="SettingsEditor/0.28.1920.919@0.28.1920.919" timestamp="1601920559859" />
+    <state x="623" y="226" width="672" height="690" key="search.everywhere.popup" timestamp="1602526809529">
+      <screen x="0" y="28" width="1920" height="919" />
+    </state>
+    <state x="623" y="223" width="672" height="678" key="search.everywhere.popup/0.28.1920.904@0.28.1920.904" timestamp="1601631466896" />
+    <state x="623" y="226" width="672" height="690" key="search.everywhere.popup/0.28.1920.919@0.28.1920.919" timestamp="1602526809529" />
+  </component>
+</project>

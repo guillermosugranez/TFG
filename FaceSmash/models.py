@@ -27,6 +27,7 @@ class User(UserMixin, Model):
 
     # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
     def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
+        print("He llamado a get_post")
         return Post.select().where(Post.user == self)
 
     def get_stream(self):
@@ -39,14 +40,25 @@ class User(UserMixin, Model):
             (Post.user == self)  # ó del mismo usuario
         )
 
+
+    def get_integrado(self):
+        """Mostrar los post míos y de la gente que sigo"""
+
+        # Devuelve todos los post
+        return Integrado.select().where(  # de...
+            # Un usuario que se encuentra en la lista de los que sigue
+            (Integrado.user == self)  # ó del mismo usuario
+        )
+
+
     def following(self):
         """Los usuarios que sigue el usuario actual"""
 
         return (
-            User.select().join( # Se usa el join porque se usan varias tablas
+            User.select().join(  # Se usa el join porque se usan varias tablas
                 Relationship, on=Relationship.to_user  # Todos los usuarios
             ).where(
-                Relationship.from_user == self # A los que sigue el actual user
+                Relationship.from_user == self  # A los que sigue el actual user
             )
         )
 
@@ -60,7 +72,6 @@ class User(UserMixin, Model):
                 Relationship.to_user == self  # A los que sigue el actual user
             )
         )
-
 
     # Constructor
     # cls hace que el método sea de la misma clase, y no de la instancia
@@ -119,11 +130,179 @@ class Relationship(Model):
         )
 
 
+class Integrado(Model):
+    """Representa un granjero asociado a la integración"""
+
+    user = ForeignKeyField(  # Los integrados los gestiona un usuario
+        User,
+        related_name='integrados',  # Nombre relacionado en la otra tabla
+
+    )
+
+    codigo = CharField(unique=True, null=False, primary_key=True)
+    tecnico = CharField(null=False)  # Puede repetirse
+    fabrica = CharField(null=False)
+    avicultor = CharField(null=False)
+    poblacion = CharField(null=False)
+    provincia = CharField(null=False)
+    ditancia = IntegerField(null=False)
+    metros_cuadrados = IntegerField(null=False)
+
+    joined_at = DateTimeField(default=datetime.datetime.now)
+    # email = CharField(unique=True)
+    # password = CharField(max_length=120)
+
+    # La clase Meta sirve para tener en cuenta los metadatos del modelo
+    # Cualquier modelo necesita la class Meta
+    # Añade información extra, al margen de los atributos, métodos... etc.
+    class Meta:
+        database = DATABASE  # Indica cuál es la bbdd del modelo
+        # Indica cómo serán ordenados los registros cuando sean creados
+        order_by = ("-joined_at",)
+
+    @classmethod
+    def create_integrado(cls, user, codigo, tecnico, fabrica, avicultor,
+                         poblacion, provincia, ditancia, metros_cuadrados):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    user=user,
+                    codigo=codigo,
+                    tecnico=tecnico,
+                    fabrica=fabrica,
+                    avicultor=avicultor,
+                    poblacion=poblacion,
+                    provincia=provincia,
+                    ditancia=ditancia,
+                    metros_cuadrados=metros_cuadrados,
+                )
+        except IntegrityError:
+            # raise ValueError("Integrado Already exists")
+            pass
+
+
+class Camada(Model):
+    """Representa una camada de un granjero asociado"""
+
+    integrado = ForeignKeyField(  # Hace referencia a un usuario
+        Integrado,  # La clave foranea apunta hacia un integrado
+        related_name='camadas',  # Nombre relacionado en la otra tabla
+    )
+
+    codigo_camada = CharField(unique=True, null=False, primary_key=True)
+
+    medicamentos = FloatField(default=0.0, null=True)
+    liquidacion = FloatField(default=0.0, null=True)
+    pollos_entrados = IntegerField(default=0, null=True)
+    pollos_salidos = IntegerField(default=0, null=True)
+    porcentaje_bajas = FloatField(default=0.0, null=True)
+    bajas_primera_semana = IntegerField(default=0, null=True)
+    porcentaje_bajas_primera_semana = FloatField(default=0.0, null=True)
+    kilos_carne = IntegerField(default=0, null=True)
+    kilos_pienso = IntegerField(default=0, null=True)
+    peso_medio = FloatField(default=0.0, null=True)
+    indice_transformacion = FloatField(default=0.0, null=True)
+    retribucion = FloatField(default=0.0, null=True)
+    medicamentos_por_pollo = FloatField(default=0.0, null=True)
+    rendimiento_metro_cuadrado = FloatField(default=0.0, null=True)
+    pollo_metro_cuadrado = FloatField(default=0.0, null=True)
+    kilos_consumidos_por_pollo_salido = FloatField(default=0.0, null=True)
+    dias_media_retirada = FloatField(default=0.0, null=True)
+    ganancia_media_diaria = FloatField(default=0.0, null=True)
+    dias_primer_camion = IntegerField(default=0, null=True)
+    peso_primer_dia = FloatField(default=0.0, null=True)
+    peso_semana_1 = FloatField(default=0.0, null=True)
+    peso_semana_2 = FloatField(default=0.0, null=True)
+    peso_semana_3 = FloatField(default=0.0, null=True)
+    peso_semana_4 = FloatField(default=0.0, null=True)
+    peso_semana_5 = FloatField(default=0.0, null=True)
+    peso_semana_6 = FloatField(default=0.0, null=True)
+    peso_semana_7 = FloatField(default=0.0, null=True)
+    fecha = DateField(formats='%d/%m/%Y', null=True)
+    rendimiento = FloatField(default=0.0, null=True)
+    FP = FloatField(default=0.0, null=True)
+    bajas_matadero = IntegerField(default=0, null=True)
+    decomisos_matadero = IntegerField(default=0, null=True)
+    porcentaje_bajas_matadero = FloatField(default=0.0, null=True)
+    porcentaje_decomisos = FloatField(default=0.0, null=True)
+
+    # La clase Meta sirve para tener en cuenta los metadatos del modelo
+    # Cualquier modelo necesita la class Meta
+    # Añade información extra, al margen de los atributos, métodos... etc.
+    class Meta:
+        database = DATABASE  # Indica cuál es la bbdd del modelo
+        # Indica cómo serán ordenados los registros cuando sean creados
+        # order_by = ("-joined_at",)
+
+    @classmethod
+    def create_camada(cls, integrado, codigo_camada, medicamentos, liquidacion,
+                      pollos_entrados,
+                      pollos_salidos, porcentaje_bajas, bajas_primera_semana,
+                      porcentaje_bajas_primera_semana, kilos_carne,
+                      kilos_pienso, peso_medio, indice_transformacion,
+                      retribucion, medicamentos_por_pollo,
+                      rendimiento_metro_cuadrado, pollo_metro_cuadrado,
+                      kilos_consumidos_por_pollo_salido, dias_media_retirada,
+                      ganancia_media_diaria, dias_primer_camion,
+                      peso_primer_dia, peso_semana_1, peso_semana_2,
+                      peso_semana_3, peso_semana_4, peso_semana_5,
+                      peso_semana_6, peso_semana_7, fecha, rendimiento,
+                      FP, bajas_matadero, decomisos_matadero,
+                      porcentaje_bajas_matadero, porcentaje_decomisos):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    integrado=integrado,
+                    codigo_camada=codigo_camada,
+                    medicamentos=medicamentos,
+                    liquidacion=liquidacion,
+                    pollos_entrados=pollos_entrados,
+                    pollos_salidos=pollos_salidos,
+                    porcentaje_bajas=porcentaje_bajas,
+                    bajas_primera_semana=bajas_primera_semana,
+                    porcentaje_bajas_primera_semana=porcentaje_bajas_primera_semana,
+                    kilos_carne=kilos_carne,
+                    kilos_pienso=kilos_pienso,
+                    peso_medio=peso_medio,
+                    indice_transformacion=indice_transformacion,
+                    retribucion=retribucion,
+                    medicamentos_por_pollo=medicamentos_por_pollo,
+                    rendimiento_metro_cuadrado=rendimiento_metro_cuadrado,
+                    pollo_metro_cuadrado=pollo_metro_cuadrado,
+                    kilos_consumidos_por_pollo_salido=kilos_consumidos_por_pollo_salido,
+                    dias_media_retirada=dias_media_retirada,
+                    ganancia_media_diaria=ganancia_media_diaria,
+                    dias_primer_camion=dias_primer_camion,
+                    peso_primer_dia=peso_primer_dia,
+                    peso_semana_1=peso_semana_1,
+                    peso_semana_2=peso_semana_2,
+                    peso_semana_3=peso_semana_3,
+                    peso_semana_4=peso_semana_4,
+                    peso_semana_5=peso_semana_5,
+                    peso_semana_6=peso_semana_6,
+                    peso_semana_7=peso_semana_7,
+                    fecha=fecha,
+                    rendimiento=rendimiento,
+                    FP=FP,
+                    bajas_matadero=bajas_matadero,
+                    decomisos_matadero=decomisos_matadero,
+                    porcentaje_bajas_matadero=porcentaje_bajas_matadero,
+                    porcentaje_decomisos=porcentaje_decomisos,
+                )
+        except IntegrityError:
+            # raise ValueError("Camada Already exists")
+            pass
+
+
 def initialize():
     """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
     DATABASE.connect()  # Establece la conexión
-    DATABASE.create_tables([User, Post, Relationship], safe=True)
+    DATABASE.create_tables([User, Post, Relationship, Integrado, Camada], safe=True)
     DATABASE.close()  # Se cierra
 
 # -----------------------------------------------------------------------------
