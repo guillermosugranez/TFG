@@ -1,5 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, FileField
+from wtforms import (
+    StringField, PasswordField, TextAreaField, FileField, DateField,
+    IntegerField
+)
 from wtforms.validators import (  # Validadores para los formularios
     DataRequired, ValidationError, Email, Regexp, Length, EqualTo
 )
@@ -82,4 +85,15 @@ class LoadDataForm(FlaskForm):
 
     file = FileField('Selecciona un fichero', validators=[DataRequired()])
 
+class SearchForm(FlaskForm):
+    """Formulario para la busqueda en la sección de analisis de datos"""
 
+    print("form")
+
+    num = IntegerField('num', validators=[DataRequired()])
+
+    desde = DateField("desde", format="%d-%m-%Y", validators=[DataRequired()])
+    hasta = DateField("hasta", format="%d-%m-%Y", validators=[DataRequired()])
+
+    # email = StringField('Email', validators=[DataRequired(), Email()])
+    # password = PasswordField('Password', validators=[DataRequired()])

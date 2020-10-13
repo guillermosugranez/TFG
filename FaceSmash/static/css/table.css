@@ -1,4 +1,5 @@
-#table-main-container {
+/* table-container-main */
+#table-container-main {
     height: 100%;
     width: 100%;
     display: flex;
@@ -7,35 +8,27 @@
     padding: 1%;
 }
 
-#table-container-00 {
+        /* Search*/
+#table-container-left-0 {
     height: 100%;
-    width: 70%;
+    width: 25%;
     //background: blue;
-    align-items: center;
-    justify-content: center;
     margin-right: 1%;
 }
 
-#table-container-00-search {
-    height: 20%;
-    width: 100%;
-    padding: 2%;
-    //background: pink;
-}
-
-#table-container-00-table {
-    height: 80%;
-    width: 100%;
-    padding: 2%;
-    overflow: scroll;
-    //background: green;
-}
-
-#table-container-01 {
+        /* Table */
+#table-container-right-0 {
     height: 100%;
-    width: 30%;
+    width: 75%;
     //background: yellow;
+    overflow: scroll;
     padding: 1%
+}
+
+        /*h2*/
+#table-h2-0 {
+    text-align: center;
+    padding: 5%;
 }
 
 /*=============================== Data Table ================================*/

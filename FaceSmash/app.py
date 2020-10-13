@@ -400,35 +400,59 @@ def stream(username=None):
         template = 'user_stream.html'  # Para otro usuario
     return render_template(template, stream=s, user=user)
 
+# def get_query_params(query_params):
+#     """Permite realizar una nueva búsqueda con el formulario de búsqueda"""
+#
+#     form = forms.SearchForm()
+#
+#     # Se ejecuta el método si la validación al hacer click en el HTML es válida
+#     if form.validate_on_submit():
+#         query_params["desde"]=form.desde.data
+#         query_params["hasta"]=form.hasta.data
+#
+#         return render_template('table.html', form=form)
+#
+#     return query_params
 
-def search_function():
-    """Devuelve un dataframe con la consulta realizada"""
+def search_function(query_params):
+    """Devuelve un dataframe con la consulta realizada
+        1) Se establece configuración
+    """
 
-    cnx = sqlite3.connect('social.db')
-    df_query = pd.read_sql_query("SELECT * FROM camada", cnx)
+    query = models.Camada.select().where(
+        query_params["desde"] > models.Camada.fecha < query_params["hasta"]
+    )
+
+    df_query = pd.DataFrame(list(query.dicts()))
+
+    # cnx = sqlite3.connect('social.db')
+    # df_query = pd.read_sql_query("SELECT * FROM camada", cnx)
+    # df_query = pd.read_sql_query(
+    #     "SELECT * FROM camada WHERE fecha > '" + desde + "' AND  fehca <= '" + hasta + "'",
+    #     cnx)
 
     return df_query
 
-@app.route('/table')  # timeline de un usuario específico
-def show_table():
-    """
-    Muestra hasta 100 post
-    - Cuando no se le proporciona nombre de usuario, te muestra el general
-    - Cuando se le proporciona un nombre te muestra solo los de ese usuario
-    """
+@login_required
+@app.route('/search', methods=('GET', 'POST'))
+def search():
 
-    user = current_user
-    # s = current_user.get_integrado().limit(100)
-
-    # table = pd.DataFrame({'name': ['Somu', 'Kiku', 'Amol', 'Lini', 'Guille'],
-    #                          'physics': [68, 74, 77, 78, 56],
-    #                          'chemistry': [84, 56, 73, 69, 48],
-    #                          'algebra': [78, 88, 82, 87, 98]})
-
-    table = search_function()
+    # Default query_params
+    query_params = {
+        "desde": "2015-01-01",
+        "hasta": "2015-01-30",
+        "num": 1
+    }
 
     elementos_cabecera = []
     elementos_fila = []
+    user = current_user
+
+    query_params["num"] = request.form["num"]
+    query_params["desde"] = request.form["desde"]
+    query_params["hasta"] = request.form["hasta"]
+
+    table = search_function(query_params)
 
     for llave in table:
         elementos_cabecera.append(llave)
@@ -436,12 +460,60 @@ def show_table():
     for i in table.index:
         lista_auxiliar = []
         for campo in elementos_cabecera:
-            print(table[campo][i])
+            # print(table[campo][i])
             lista_auxiliar.append(table[campo][i])
 
         elementos_fila.append(lista_auxiliar)
 
-    return render_template('table.html', elementos_cabecera=elementos_cabecera, elementos_fila=elementos_fila ,user=user)
+
+    print(request.form["num"])
+
+    return render_template('table.html',
+                           elementos_cabecera=elementos_cabecera,
+                           elementos_fila=elementos_fila,
+                           query_params=query_params,
+                           user=user,
+                           form=request.form
+                           )
+
+@login_required
+@app.route('/table', methods=('GET', 'POST'))
+def show_table():
+    """
+    Muestra hasta 100 post
+    - Cuando no se le proporciona nombre de usuario, te muestra el general
+    - Cuando se le proporciona un nombre te muestra solo los de ese usuario
+    """
+
+    # s = current_user.get_integrado().limit(100)
+
+    # table = pd.DataFrame({'name': ['Somu', 'Kiku', 'Amol', 'Lini', 'Guille'],
+    #                          'physics': [68, 74, 77, 78, 56],
+    #                          'chemistry': [84, 56, 73, 69, 48],
+    #                          'algebra': [78, 88, 82, 87, 98]})
+
+    query_params = {
+        "desde": "2015-01-01",
+        "hasta": "2015-01-30",
+        "num": 1
+    }
+
+    form = forms.SearchForm()
+
+    # Se ejecuta el método si la validación al hacer click en el HTML es válida
+    if form.validate_on_submit():
+        if request.method == 'POST':
+            print("Aqui llega 1")
+            # query_params["desde"] = form.desde.data
+            # query_params["hasta"] = form.hasta.data
+
+            return redirect(url_for('table.html')
+                            )
+    else:
+        return render_template('table.html',
+                               form=form,
+                               query_params=query_params
+                               )
 
 
 @app.errorhandler(404)
