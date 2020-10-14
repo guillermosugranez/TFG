@@ -1,4 +1,6 @@
-/* table-container-main */
+
+
+    /* table-container-main */
 #table-container-main {
     height: 100%;
     width: 100%;
@@ -28,7 +30,20 @@
         /*h2*/
 #table-h2-0 {
     text-align: center;
-    padding: 5%;
+    padding: 10%;
+}
+
+        /* Botones de navegación */
+#table-boton-tablas {
+    color: black;
+}
+
+#table-boton-analisis {
+    color: black;
+}
+
+#table-boton-graficos {
+    color: black;
 }
 
 /*=============================== Data Table ================================*/

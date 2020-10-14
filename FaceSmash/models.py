@@ -140,6 +140,7 @@ class Integrado(Model):
     )
 
     codigo = CharField(unique=True, null=False, primary_key=True)
+
     tecnico = CharField(null=False)  # Puede repetirse
     fabrica = CharField(null=False)
     avicultor = CharField(null=False)

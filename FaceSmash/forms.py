@@ -88,8 +88,6 @@ class LoadDataForm(FlaskForm):
 class SearchForm(FlaskForm):
     """Formulario para la busqueda en la sección de analisis de datos"""
 
-    print("form")
-
     num = IntegerField('num', validators=[DataRequired()])
 
     desde = DateField("desde", format="%d-%m-%Y", validators=[DataRequired()])

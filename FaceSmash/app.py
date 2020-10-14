@@ -47,7 +47,6 @@ def admin_loader():
     admin.add_view(ModelView(models.Integrado))
     admin.add_view(ModelView(models.Camada))
 
-
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
@@ -466,7 +465,7 @@ def search():
         elementos_fila.append(lista_auxiliar)
 
 
-    print(request.form["num"])
+    # print(request.form["num"])
 
     return render_template('table.html',
                            elementos_cabecera=elementos_cabecera,
