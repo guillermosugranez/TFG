@@ -95,39 +95,82 @@ class User(UserMixin, Model):
             raise ValueError("User Already exists")
 
 
-class Post(Model):
-    """Pequeños mensajes que aparecen en el timeline de FaceSmash"""
+# class Post(Model):
+#     """Pequeños mensajes que aparecen en el timeline de FaceSmash"""
+#
+#     # Qué es lo que tiene un post?
+#     user = ForeignKeyField(  # Hace referencia a un usuario
+#         User,  # A dónde apunta esta clave foránea? Hacia un usuario
+#         related_name='posts',  # Nombre relacionado en la otra tabla
+#
+#     )
+#     timestamp = DateTimeField(default=datetime.datetime.now)
+#     content = TextField()
+#
+#     class Meta:
+#         database = DATABASE
+#
+#         # La coma indica que es una tupla. Evita posibles errores
+#         order_by = ('-joined_at',)
 
-    # Qué es lo que tiene un post?
-    user = ForeignKeyField(  # Hace referencia a un usuario
-        User,  # A dónde apunta esta clave foránea? Hacia un usuario
-        related_name='posts',  # Nombre relacionado en la otra tabla
 
-    )
-    timestamp = DateTimeField(default=datetime.datetime.now)
-    content = TextField()
+# class Relationship(Model):
+#     """ Representa que un usuario (from) sigue a otro (to)"""
+#
+#     from_user = ForeignKeyField(User, related_name='relationships')
+#     to_user = ForeignKeyField(User, related_name='related_to')
+#
+#     class Meta:
+#         database = DATABASE
+#         # Atributo indexes. Sirve para:
+#         # - Buscar más rápidamente en la bbdd
+#         # - Definir relaciones únicas. No seguir a un mismo usuario más de 1 vez
+#         indexes = (
+#             (('from_user', 'to_user'), True),
+#         )
+
+
+class Tecnico(Model):
+    """"""
+
+    nombre_tecnico = CharField(unique=True, null=False, primary_key=True)
 
     class Meta:
         database = DATABASE
 
-        # La coma indica que es una tupla. Evita posibles errores
-        order_by = ('-joined_at',)
+    @classmethod
+    def create_tecnico(cls, nombre_tecnico):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    nombre_tecnico=nombre_tecnico,
+                )
+        except IntegrityError:
+            raise ValueError("Tecnico Already exists")
 
 
-class Relationship(Model):
-    """ Representa que un usuario (from) sigue a otro (to)"""
+class Provincia(Model):
+    """"""
 
-    from_user = ForeignKeyField(User, related_name='relationships')
-    to_user = ForeignKeyField(User, related_name='related_to')
+    nombre_provincia = CharField(unique=True, null=False, primary_key=True)
 
     class Meta:
         database = DATABASE
-        # Atributo indexes. Sirve para:
-        # - Buscar más rápidamente en la bbdd
-        # - Definir relaciones únicas. No seguir a un mismo usuario más de 1 vez
-        indexes = (
-            (('from_user', 'to_user'), True),
-        )
+
+    @classmethod
+    def create_provincia(cls, nombre_provincia):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    nombre_provincia=nombre_provincia,
+                )
+        except IntegrityError:
+            raise ValueError("Provincia Already exists")
+
 
 
 class Integrado(Model):
@@ -139,13 +182,26 @@ class Integrado(Model):
 
     )
 
-    codigo = CharField(unique=True, null=False, primary_key=True)
+    codigo = CharField(null=False)
+    nombre_integrado = CharField(unique=True, null=False, primary_key=True)
 
-    tecnico = CharField(null=False)  # Puede repetirse
+
     fabrica = CharField(null=False)
-    avicultor = CharField(null=False)
+
     poblacion = CharField(null=False)
-    provincia = CharField(null=False)
+
+    tecnico = ForeignKeyField(  # Los integrados los gestiona un usuario
+        Tecnico,
+        related_name='tecnico',  # Nombre relacionado en la otra tabla
+
+    )
+
+    provincia = ForeignKeyField(  # Los integrados los gestiona un usuario
+        Provincia,
+        related_name='provincia',  # Nombre relacionado en la otra tabla
+
+    )
+
     ditancia = IntegerField(null=False)
     metros_cuadrados = IntegerField(null=False)
 
@@ -162,7 +218,7 @@ class Integrado(Model):
         order_by = ("-joined_at",)
 
     @classmethod
-    def create_integrado(cls, user, codigo, tecnico, fabrica, avicultor,
+    def create_integrado(cls, user, codigo, tecnico, fabrica, nombre_integrado,
                          poblacion, provincia, ditancia, metros_cuadrados):
         try:
             with DATABASE.transaction():
@@ -173,7 +229,7 @@ class Integrado(Model):
                     codigo=codigo,
                     tecnico=tecnico,
                     fabrica=fabrica,
-                    avicultor=avicultor,
+                    nombre_integrado=nombre_integrado,
                     poblacion=poblacion,
                     provincia=provincia,
                     ditancia=ditancia,
@@ -303,7 +359,7 @@ def initialize():
     """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
     DATABASE.connect()  # Establece la conexión
-    DATABASE.create_tables([User, Post, Relationship, Integrado, Camada], safe=True)
+    DATABASE.create_tables([User, Provincia, Tecnico, Integrado, Camada], safe=True)
     DATABASE.close()  # Se cierra
 
 # -----------------------------------------------------------------------------

@@ -1,53 +1,96 @@
 
-
-    /* table-container-main */
+        /* contenedor principal */
 #table-container-main {
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: row;
     background: white;
-    padding: 1%;
 }
 
-        /* Search*/
-#table-container-left-0 {
-    height: 100%;
-    width: 25%;
-    //background: blue;
+
+        /* Búsqueda */
+#table-container-left {
+    width: 20%;
+    /*background: blue;*/
+    min-width: 300px;
     margin-right: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
 }
 
-        /* Table */
-#table-container-right-0 {
-    height: 100%;
-    width: 75%;
-    //background: yellow;
-    overflow: scroll;
-    padding: 1%
-}
-
-        /*h2*/
+        /* Cabecera de búsqueda */
 #table-h2-0 {
     text-align: center;
     padding: 10%;
 }
 
-        /* Botones de navegación */
-#table-boton-tablas {
-    color: black;
+
+        /* Cambiar color a los elementos del nav */
+#nav-table {
+    color: green;
+    font-weight: bold;
 }
 
-#table-boton-analisis {
-    color: black;
+.nav-item > a {
+  color: grey;
 }
 
-#table-boton-graficos {
-    color: black;
+
+        /* Datos */
+#table-container-right {
+    width: 80%;
+    /*background: yellow;*/
+    overflow: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    padding: 0;
 }
+
+
+        /* Navbar de datos */
+#table-container-nav {
+    width: 100%;
+    margin-bottom: 2%;
+    top: 0;
+    left: 0;
+    background: white;
+    padding: 0%;
+}
+
+
+        /* Tabla */
+#table-container-table {
+    width: 100%;
+    overflow: auto;
+    /*background: yellow;*/
+}
+
+
+        /* Estadísticas */
+#table-container-stats {
+    width: 100%;
+    background: red;
+    padding: 1%;
+}
+
+
+        /* Gráficos */
+#table-container-graphics {
+    width: 100%;
+    background: blue;
+    padding: 1%;
+}
+
 
 /*=============================== Data Table ================================*/
 
+#table_id tr {
+    white-space:nowrap !important;
+    font-size: 16px !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
+}
 /*
  * Table styles
  */

@@ -25,6 +25,7 @@ import sqlite3
 
 
 import models
+
 import forms  # LoginForm, RegisterForm
 
 DEBUG = True  # Mayúsculas indica que es global (por convenio)
@@ -32,6 +33,13 @@ PORT = 8000
 HOST = '0.0.0.0'
 UPLOAD_FOLDER = os.getcwd() + '/make_dataset/import_data'
 ALLOWED_EXTENSIONS = {'xlsx'}
+CONFIGURACION = {
+    'provincias'        : ['huelva', 'sevilla', 'badajoz', 'cordoba'],
+    'tecnicos'          : ['carlos', 'sandra', 'eduardo'],
+    # 'nombre_integrado'  : ["AGROGANADERA MORANDOM", "JOSE MANUEL ROMERO MOLIN", "JUANA LOPEZ GUTIERREZ", "HNOS ALCAIDE, C.B.", "EDUARDO MARTÍN MARTÍN", "DEHESA LA ROTURA", "AGROGANADERA PINARES, SC", "HERMANOS CARRERO REYES, SC", "MIGUEL ANGEL GARRIDO TABODA", "DANIEL GALLARDO RODRIGUEZ", "AVES EL SAUCEJO, S.L.", "MANUEL PADILLA GARCÍA", "LUCAS REBOLLO ORTIZ", "JOSE ANTONIO BANDO MUÑOZ", "EXP.AGROPECUARIAS RIVERA DE HUELVA, S.L.", "CRISTOBAL MONCAYO HORMIGO", "DIEGO J. DOMINGUEZ ALBA", "JUAN LOPEZ GUTIERREZ", "ANTONIO CARDENAS BERLANGA", "JOSE DOMINGO SUAREZ LAVADO", "FRANCISCO JOSE CAMACHO SALAS", "VICTORINO RUBIO BRAVO", "BLAS ROMAN POVEA (INTEGRACION)", "BLAS ROMAN POVEA", "ALONSO ROBLES MORENO", "LOPEZ SOLTERO, SCA", "AGRICOLA HEREDIA MORENO, SC", "JUAN MANUEL CORONA RUEDA", "MJC. NARANJO RODIGUEZ,  SL", "LUIS ALFONSO VAZQUEZ", "MARIA DOLORES DOMINGUEZ GONZALEZ", "ROSARIO MINERO ", "CRISTAL RONCERO GONZÁLEZ", "AVEPRA, SL ", "AGROAVI PÉREZ VIDES", "MANUEL POVEA CARRASCO", "ENCARNACIÓN CLAVERO", "JUAN FERIA (FINCA VILLARAMOS)", "MARIA ISABEL MACIAS GARCIA", "MIGUEL ROSA BLANCO", "CONCEPCION MORATA ESTEPA", "CARMEN REAL ESTEBAN", "AVICOLA VALDELIMONES, S.L.", "FELIPE CALVENTE ROMERO", "MARIA VAZQUEZ RAMOS", "TEODORA DOMÍNGUEZ", "GONAN AVICULTURA, C.B.", "ISABEL CONTRERAS DOMINGUEZ", "JUAN SOSA CARMONA", "MANUEL CRUZ GARRIDO", "RICARDO SÁNCHEZ", "GONZALEZ MEJIAS E HIJOS, S.L.", "GENMA ORTIZ VAZQUEZ", "DEHESA SAN JUAN, SA", "RAUL ORTEGA JUAN", "MARIA JOSE RUIZ MOLINA", "GONAN AVICULTURA", "HNOS MATEOS, SCA", "ANTONIO VEGA PÉREZ", "BERNARDINO ROMERO, SL ", "LA PARRILLA 2000, SL"],
+    'campos_mostrados'  : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria']
+}
+
 
 app = Flask(__name__)  # Se instancia la aplicación
 app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnv´lsjdAsCaxcAv'  # Llave Secreta.
@@ -46,6 +54,9 @@ def admin_loader():
     admin.add_view(ModelView(models.User))
     admin.add_view(ModelView(models.Integrado))
     admin.add_view(ModelView(models.Camada))
+    admin.add_view(ModelView(models.Tecnico))
+    admin.add_view(ModelView(models.Provincia))
+
 
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
@@ -241,6 +252,22 @@ def post():
     return render_template('post.html', form=form)
 
 
+def check_provincia(nombre_provincia):
+
+    if nombre_provincia.strip().lower() in CONFIGURACION['provincias']:
+        return True
+    else:
+        return False
+
+
+def check_tecnico(nombre_tecnico):
+
+    if nombre_tecnico.strip().lower() in CONFIGURACION['tecnicos']:
+        return True
+    else:
+        return False
+
+
 def allowed_file(filename):
     """Comprueba si la extension del archivo es válida"""
 
@@ -252,28 +279,45 @@ def dataset_to_bd(dataframe):
 
     d = dataframe.to_dict('index')
 
-    i=0
+    registro_valido = True
+
     for registro in d:
-        print(i, d[registro])
-        # Se crea el integrado
-        models.Integrado.create_integrado(
-            user=g.user._get_current_object(),
-            tecnico=d[registro]['Técnico'],
-            fabrica=d[registro]['Fab. Pienso'],
-            codigo=d[registro]['Código'],
-            avicultor=d[registro]['Avicultor'],
-            poblacion=d[registro]['Población'],
-            provincia=d[registro]['Provincia'],
-            ditancia=d[registro]['Distancia a Matadero Purullena'],
-            metros_cuadrados=d[registro]['Mts Cuadrados'],
-        )
 
-        # Cojo el integrado que ya está en bbdd
-        integrado = models.Integrado.get(
-            models.Integrado.codigo**
-            d[registro]['Código'])
+        # Se validan los datos. Si falla salta el registro:
+        registro_valido = registro_valido * check_provincia(d[registro]['Provincia'])
+        registro_valido = registro_valido * check_tecnico(d[registro]['Técnico'])
+        if(registro_valido):
 
-        print(integrado)
+            # Cojo la provincia que ya está en bbdd
+            provincia = models.Provincia.get(
+                models.Provincia.nombre_provincia **
+                (d[registro]['Provincia']).strip().lower())
+
+            tecnico = models.Tecnico.get(
+                models.Tecnico.nombre_tecnico **
+                (d[registro]['Técnico']).strip().lower())
+
+            # Se crea el integrado
+            models.Integrado.create_integrado(
+                user=g.user._get_current_object(),
+                tecnico=tecnico,
+                fabrica=d[registro]['Fab. Pienso'],
+                codigo=d[registro]['Código'],
+                nombre_integrado=d[registro]['Avicultor'].strip().lower(),
+                poblacion=d[registro]['Población'],
+                provincia=provincia,
+                ditancia=d[registro]['Distancia a Matadero Purullena'],
+                metros_cuadrados=d[registro]['Mts Cuadrados'],
+            )
+
+            # ==================================================================
+
+            # Cojo el integrado que ya está en bbdd
+            integrado = models.Integrado.get(
+                models.Integrado.nombre_integrado**
+                d[registro]['Avicultor'].strip().lower())
+
+            # print(integrado)
 
         # Se crea la camada
         models.Camada.create_camada(
@@ -314,7 +358,6 @@ def dataset_to_bd(dataframe):
             porcentaje_bajas_matadero=d[registro]['% Bajas'],
             porcentaje_decomisos=d[registro]['% Decomisos'],
         )
-        i = i+1
 
     return True
 
@@ -453,16 +496,38 @@ def search():
 
     table = search_function(query_params)
 
+    condicion = True
+
+    if(condicion):
+        del table['medicamentos']
+
+    # print(table)
+
     for llave in table:
-        elementos_cabecera.append(llave)
+        if(llave in CONFIGURACION['campos_mostrados']):
+            elementos_cabecera.append(llave.replace("_", " "))
+
+    print(elementos_cabecera)
+
+    # print(elementos_cabecera)
 
     for i in table.index:
         lista_auxiliar = []
-        for campo in elementos_cabecera:
-            # print(table[campo][i])
-            lista_auxiliar.append(table[campo][i])
+        for campo in CONFIGURACION['campos_mostrados']:
+            if campo == 'porcentaje_bajas':
+                valor = "{} %".format(round((table[campo][i] * 100), 2))
+            elif campo == 'integrado':
+                valor = table[campo][i]
+            elif campo in ['pollos_entrados', 'pollos_salidos', 'kilos_carne', 'kilos_pienso']:
+                valor = format((f'{table[campo][i]:,.0f}')).replace(',','~').replace('.',',').replace('~','.')
+            else:
+                valor = format((f'{table[campo][i]:,.4f}')).replace(',','~').replace('.',',').replace('~','.')
 
+            lista_auxiliar.append(valor)
+
+        # Se añade la fila
         elementos_fila.append(lista_auxiliar)
+
 
 
     # print(request.form["num"])
@@ -531,6 +596,24 @@ if __name__ == "__main__":
         )
     except ValueError:  # Si el usuario ya está en la bbdd
         pass
+
+    # Inicializar provincias
+    for provincia in CONFIGURACION['provincias']:
+        try:
+            models.Provincia.create_provincia(
+                nombre_provincia=provincia
+            )
+        except ValueError:  # Si el usuario ya está en la bbdd
+            pass
+
+        # Inicializar provincias
+    for tecnico in CONFIGURACION['tecnicos']:
+        try:
+            models.Tecnico.create_tecnico(
+                nombre_tecnico=tecnico
+            )
+        except ValueError:  # Si el usuario ya está en la bbdd
+            pass
 
     admin_loader()
     app.run(debug=DEBUG, host=HOST, port=PORT)
