@@ -172,6 +172,48 @@ class Provincia(Model):
             raise ValueError("Provincia Already exists")
 
 
+class Fabrica(Model):
+    """"""
+
+    nombre_fabrica = CharField(unique=True, null=False, primary_key=True)
+
+    class Meta:
+        database = DATABASE
+
+    @classmethod
+    def create_fabrica(cls, nombre_fabrica):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    nombre_fabrica=nombre_fabrica,
+                )
+        except IntegrityError:
+            raise ValueError("Fabrica Already exists")
+
+
+class Poblacion(Model):
+    """"""
+
+    nombre_poblacion = CharField(unique=True, null=False, primary_key=True)
+
+    class Meta:
+        database = DATABASE
+
+    @classmethod
+    def create_poblacion(cls, nombre_poblacion):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    nombre_poblacion=nombre_poblacion,
+                )
+        except IntegrityError:
+            raise ValueError("Poblacion Already exists")
+
+
 
 class Integrado(Model):
     """Representa un granjero asociado a la integración"""
@@ -185,10 +227,16 @@ class Integrado(Model):
     codigo = CharField(null=False)
     nombre_integrado = CharField(unique=True, null=False, primary_key=True)
 
+    fabrica = ForeignKeyField(  # Los integrados los gestiona un usuario
+        Fabrica,
+        related_name='fabrica',  # Nombre relacionado en la otra tabla
 
-    fabrica = CharField(null=False)
+    )
 
-    poblacion = CharField(null=False)
+    poblacion = ForeignKeyField(  # Los integrados los gestiona un usuario
+        Poblacion,
+        related_name='poblacion',  # Nombre relacionado en la otra tabla
+    )
 
     tecnico = ForeignKeyField(  # Los integrados los gestiona un usuario
         Tecnico,
@@ -359,7 +407,7 @@ def initialize():
     """Crea las tablas del proyecto a partir de los modelos propuestos"""
 
     DATABASE.connect()  # Establece la conexión
-    DATABASE.create_tables([User, Provincia, Tecnico, Integrado, Camada], safe=True)
+    DATABASE.create_tables([User, Provincia, Poblacion, Fabrica, Tecnico, Integrado, Camada], safe=True)
     DATABASE.close()  # Se cierra
 
 # -----------------------------------------------------------------------------
@@ -405,7 +453,7 @@ def initialize():
 # Lección 39 - Creando nuestras tablas
 #
 # Hay que crear las tablas a partir de los modelos propuestos
-# Por legibilidad, esta tarea se define en un método 
+# Por legibilidad, esta tarea se define en un método
 
 # -----------------------------------------------------------------------------
 # Lección 39 - Formularios

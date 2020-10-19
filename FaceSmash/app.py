@@ -36,8 +36,10 @@ ALLOWED_EXTENSIONS = {'xlsx'}
 CONFIGURACION = {
     'provincias'        : ['huelva', 'sevilla', 'badajoz', 'cordoba'],
     'tecnicos'          : ['carlos', 'sandra', 'eduardo'],
+    'fabricas'          : ['nuter', 'picasat'],
     # 'nombre_integrado'  : ["AGROGANADERA MORANDOM", "JOSE MANUEL ROMERO MOLIN", "JUANA LOPEZ GUTIERREZ", "HNOS ALCAIDE, C.B.", "EDUARDO MARTÍN MARTÍN", "DEHESA LA ROTURA", "AGROGANADERA PINARES, SC", "HERMANOS CARRERO REYES, SC", "MIGUEL ANGEL GARRIDO TABODA", "DANIEL GALLARDO RODRIGUEZ", "AVES EL SAUCEJO, S.L.", "MANUEL PADILLA GARCÍA", "LUCAS REBOLLO ORTIZ", "JOSE ANTONIO BANDO MUÑOZ", "EXP.AGROPECUARIAS RIVERA DE HUELVA, S.L.", "CRISTOBAL MONCAYO HORMIGO", "DIEGO J. DOMINGUEZ ALBA", "JUAN LOPEZ GUTIERREZ", "ANTONIO CARDENAS BERLANGA", "JOSE DOMINGO SUAREZ LAVADO", "FRANCISCO JOSE CAMACHO SALAS", "VICTORINO RUBIO BRAVO", "BLAS ROMAN POVEA (INTEGRACION)", "BLAS ROMAN POVEA", "ALONSO ROBLES MORENO", "LOPEZ SOLTERO, SCA", "AGRICOLA HEREDIA MORENO, SC", "JUAN MANUEL CORONA RUEDA", "MJC. NARANJO RODIGUEZ,  SL", "LUIS ALFONSO VAZQUEZ", "MARIA DOLORES DOMINGUEZ GONZALEZ", "ROSARIO MINERO ", "CRISTAL RONCERO GONZÁLEZ", "AVEPRA, SL ", "AGROAVI PÉREZ VIDES", "MANUEL POVEA CARRASCO", "ENCARNACIÓN CLAVERO", "JUAN FERIA (FINCA VILLARAMOS)", "MARIA ISABEL MACIAS GARCIA", "MIGUEL ROSA BLANCO", "CONCEPCION MORATA ESTEPA", "CARMEN REAL ESTEBAN", "AVICOLA VALDELIMONES, S.L.", "FELIPE CALVENTE ROMERO", "MARIA VAZQUEZ RAMOS", "TEODORA DOMÍNGUEZ", "GONAN AVICULTURA, C.B.", "ISABEL CONTRERAS DOMINGUEZ", "JUAN SOSA CARMONA", "MANUEL CRUZ GARRIDO", "RICARDO SÁNCHEZ", "GONZALEZ MEJIAS E HIJOS, S.L.", "GENMA ORTIZ VAZQUEZ", "DEHESA SAN JUAN, SA", "RAUL ORTEGA JUAN", "MARIA JOSE RUIZ MOLINA", "GONAN AVICULTURA", "HNOS MATEOS, SCA", "ANTONIO VEGA PÉREZ", "BERNARDINO ROMERO, SL ", "LA PARRILLA 2000, SL"],
-    'campos_mostrados'  : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria']
+    'campos_mostrados'  : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria'],
+    'poblaciones'       : ["la nava", "cartaya", "los corrales", "aracena", "santa ana la real", "escacema del campo", "fuentes de león", "villanueva de san juan", "nerva", "martin de la jara", "la palma del condado", "aljaraque", "san juan del puerto", "almonte", "bollullos del condado", "fuente de leon", "el saucejo", "barbara de casas", "pedrera", "tocina", "san silvestre de guzman", "almonaster la real", "trigueros", "valverde del camino", "jerez de los caballeros", "santa eufemia", "campofrio", "carboneras", "lepe", "segura de leon", "bellavista", "la puebla de los infantes", "moguer", "el patras", "monesterio", "castillo de las guardas", "villamanrique de la condesa", "pilas", "valdezufre"]
 }
 
 
@@ -56,6 +58,8 @@ def admin_loader():
     admin.add_view(ModelView(models.Camada))
     admin.add_view(ModelView(models.Tecnico))
     admin.add_view(ModelView(models.Provincia))
+    admin.add_view(ModelView(models.Fabrica))
+    admin.add_view(ModelView(models.Poblacion))
 
 
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
@@ -257,6 +261,7 @@ def check_provincia(nombre_provincia):
     if nombre_provincia.strip().lower() in CONFIGURACION['provincias']:
         return True
     else:
+        print("nombre provincia no valido")
         return False
 
 
@@ -265,6 +270,24 @@ def check_tecnico(nombre_tecnico):
     if nombre_tecnico.strip().lower() in CONFIGURACION['tecnicos']:
         return True
     else:
+        print("tecnico no valido")
+        return False
+
+
+def check_fabrica(nombre_fabrica):
+
+    if nombre_fabrica.strip().lower() in CONFIGURACION['fabricas']:
+        return True
+    else:
+        print("fabrica no valido")
+        return False
+
+def check_poblacion(nombre_poblacion):
+
+    if nombre_poblacion.strip().lower() in CONFIGURACION['poblaciones']:
+        return True
+    else:
+        print("poblacion no valido")
         return False
 
 
@@ -278,14 +301,17 @@ def dataset_to_bd(dataframe):
     """Procesa la información de un dataset y trata de guardarla en la bbdd"""
 
     d = dataframe.to_dict('index')
-
-    registro_valido = True
-
+    
     for registro in d:
+
+        registro_valido = True
 
         # Se validan los datos. Si falla salta el registro:
         registro_valido = registro_valido * check_provincia(d[registro]['Provincia'])
         registro_valido = registro_valido * check_tecnico(d[registro]['Técnico'])
+        registro_valido = registro_valido * check_fabrica(d[registro]['Fab. Pienso'])
+        registro_valido = registro_valido * check_poblacion(d[registro]['Población'])
+
         if(registro_valido):
 
             # Cojo la provincia que ya está en bbdd
@@ -297,14 +323,22 @@ def dataset_to_bd(dataframe):
                 models.Tecnico.nombre_tecnico **
                 (d[registro]['Técnico']).strip().lower())
 
+            fabrica = models.Fabrica.get(
+                models.Fabrica.nombre_fabrica **
+                (d[registro]['Fab. Pienso']).strip().lower())
+
+            poblacion = models.Poblacion.get(
+                models.Poblacion.nombre_poblacion **
+                (d[registro]['Población']).strip().lower())
+
             # Se crea el integrado
             models.Integrado.create_integrado(
                 user=g.user._get_current_object(),
                 tecnico=tecnico,
-                fabrica=d[registro]['Fab. Pienso'],
+                fabrica=fabrica,
                 codigo=d[registro]['Código'],
                 nombre_integrado=d[registro]['Avicultor'].strip().lower(),
-                poblacion=d[registro]['Población'],
+                poblacion=poblacion,
                 provincia=provincia,
                 ditancia=d[registro]['Distancia a Matadero Purullena'],
                 metros_cuadrados=d[registro]['Mts Cuadrados'],
@@ -319,45 +353,45 @@ def dataset_to_bd(dataframe):
 
             # print(integrado)
 
-        # Se crea la camada
-        models.Camada.create_camada(
-            integrado=integrado,
-            codigo_camada=d[registro]['Código Camada'],
-            medicamentos=d[registro]['MEDICAMENTOS'],
-            liquidacion=d[registro]['LIQUIDACIÓN'],
-            pollos_entrados=d[registro]['Pollos Entrados'],
-            pollos_salidos=d[registro]['Pollos Salidos'],
-            porcentaje_bajas=d[registro]['% Bajas'],
-            bajas_primera_semana=d[registro]['BAJAS 1a. SEMANA'],
-            porcentaje_bajas_primera_semana=d[registro]['%BAJAS 1a. Semana'],
-            kilos_carne=d[registro]['Kilos Carne'],
-            kilos_pienso=d[registro]['Kilos Pienso'],
-            peso_medio=d[registro]['Peso Medio'],
-            indice_transformacion=d[registro]['I.Transform'],
-            retribucion=d[registro]['Retribución Pollo'],
-            medicamentos_por_pollo=d[registro]['Medic/Pollo'],
-            rendimiento_metro_cuadrado=d[registro]['Rdto/M2'],
-            pollo_metro_cuadrado=d[registro]['Pollo/Mt2'],
-            kilos_consumidos_por_pollo_salido=d[registro]['Kilos Consumidos por Pollo Salido'],
-            dias_media_retirada=d[registro]['Dias Media Retirada sin Asador'],
-            ganancia_media_diaria=d[registro]['Ganancia Media Diaria'],
-            dias_primer_camion=d[registro]['Días Primer Camión'],
-            peso_primer_dia=d[registro]['Peso 1 Día'],
-            peso_semana_1=d[registro]['Peso 1 Semana'],
-            peso_semana_2=d[registro]['peso 2 semana'],
-            peso_semana_3=d[registro]['peso 3 semana'],
-            peso_semana_4=d[registro]['peso 4 semana'],
-            peso_semana_5=d[registro]['peso 5 semana'],
-            peso_semana_6=d[registro]['peso 6 semana'],
-            peso_semana_7=d[registro]['peso 7 semana'],
-            fecha=d[registro]['FECHA'],
-            rendimiento=d[registro]['Rendimiento'],
-            FP=d[registro]['%  FP'],
-            bajas_matadero=d[registro]['Bajas'],
-            decomisos_matadero=d[registro]['Decomisos'],
-            porcentaje_bajas_matadero=d[registro]['% Bajas'],
-            porcentaje_decomisos=d[registro]['% Decomisos'],
-        )
+            # Se crea la camada
+            models.Camada.create_camada(
+                integrado=integrado,
+                codigo_camada=d[registro]['Código Camada'],
+                medicamentos=d[registro]['MEDICAMENTOS'],
+                liquidacion=d[registro]['LIQUIDACIÓN'],
+                pollos_entrados=d[registro]['Pollos Entrados'],
+                pollos_salidos=d[registro]['Pollos Salidos'],
+                porcentaje_bajas=d[registro]['% Bajas'],
+                bajas_primera_semana=d[registro]['BAJAS 1a. SEMANA'],
+                porcentaje_bajas_primera_semana=d[registro]['%BAJAS 1a. Semana'],
+                kilos_carne=d[registro]['Kilos Carne'],
+                kilos_pienso=d[registro]['Kilos Pienso'],
+                peso_medio=d[registro]['Peso Medio'],
+                indice_transformacion=d[registro]['I.Transform'],
+                retribucion=d[registro]['Retribución Pollo'],
+                medicamentos_por_pollo=d[registro]['Medic/Pollo'],
+                rendimiento_metro_cuadrado=d[registro]['Rdto/M2'],
+                pollo_metro_cuadrado=d[registro]['Pollo/Mt2'],
+                kilos_consumidos_por_pollo_salido=d[registro]['Kilos Consumidos por Pollo Salido'],
+                dias_media_retirada=d[registro]['Dias Media Retirada sin Asador'],
+                ganancia_media_diaria=d[registro]['Ganancia Media Diaria'],
+                dias_primer_camion=d[registro]['Días Primer Camión'],
+                peso_primer_dia=d[registro]['Peso 1 Día'],
+                peso_semana_1=d[registro]['Peso 1 Semana'],
+                peso_semana_2=d[registro]['peso 2 semana'],
+                peso_semana_3=d[registro]['peso 3 semana'],
+                peso_semana_4=d[registro]['peso 4 semana'],
+                peso_semana_5=d[registro]['peso 5 semana'],
+                peso_semana_6=d[registro]['peso 6 semana'],
+                peso_semana_7=d[registro]['peso 7 semana'],
+                fecha=d[registro]['FECHA'],
+                rendimiento=d[registro]['Rendimiento'],
+                FP=d[registro]['%  FP'],
+                bajas_matadero=d[registro]['Bajas'],
+                decomisos_matadero=d[registro]['Decomisos'],
+                porcentaje_bajas_matadero=d[registro]['% Bajas'],
+                porcentaje_decomisos=d[registro]['% Decomisos'],
+            )
 
     return True
 
@@ -496,11 +530,6 @@ def search():
 
     table = search_function(query_params)
 
-    condicion = True
-
-    if(condicion):
-        del table['medicamentos']
-
     # print(table)
 
     for llave in table:
@@ -514,12 +543,16 @@ def search():
     for i in table.index:
         lista_auxiliar = []
         for campo in CONFIGURACION['campos_mostrados']:
+            # Porcentaje
             if campo == 'porcentaje_bajas':
                 valor = "{} %".format(round((table[campo][i] * 100), 2))
+            # Cadena de texto
             elif campo == 'integrado':
                 valor = table[campo][i]
+            # separador de miles y sin decimales
             elif campo in ['pollos_entrados', 'pollos_salidos', 'kilos_carne', 'kilos_pienso']:
                 valor = format((f'{table[campo][i]:,.0f}')).replace(',','~').replace('.',',').replace('~','.')
+            # separador de miles y 4 decimales
             else:
                 valor = format((f'{table[campo][i]:,.4f}')).replace(',','~').replace('.',',').replace('~','.')
 
@@ -567,7 +600,6 @@ def show_table():
     # Se ejecuta el método si la validación al hacer click en el HTML es válida
     if form.validate_on_submit():
         if request.method == 'POST':
-            print("Aqui llega 1")
             # query_params["desde"] = form.desde.data
             # query_params["hasta"] = form.hasta.data
 
@@ -603,16 +635,34 @@ if __name__ == "__main__":
             models.Provincia.create_provincia(
                 nombre_provincia=provincia
             )
-        except ValueError:  # Si el usuario ya está en la bbdd
+        except ValueError:  # Si la provincia ya está en la bbdd
             pass
 
-        # Inicializar provincias
+    # Inicializar provincias
     for tecnico in CONFIGURACION['tecnicos']:
         try:
             models.Tecnico.create_tecnico(
                 nombre_tecnico=tecnico
             )
-        except ValueError:  # Si el usuario ya está en la bbdd
+        except ValueError:  # Si el tecnico ya está en la bbdd
+            pass
+
+    # Inicializar fabrica
+    for fabrica in CONFIGURACION['fabricas']:
+        try:
+            models.Fabrica.create_fabrica(
+                nombre_fabrica=fabrica
+            )
+        except ValueError:  # Si el fabrica ya está en la bbdd
+            pass
+
+    # Inicializar fabrica
+    for poblacion in CONFIGURACION['poblaciones']:
+        try:
+            models.Poblacion.create_poblacion(
+                nombre_poblacion=poblacion.strip().lower()
+            )
+        except ValueError:  # Si el fabrica ya está en la bbdd
             pass
 
     admin_loader()
