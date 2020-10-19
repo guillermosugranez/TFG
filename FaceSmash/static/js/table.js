@@ -26,17 +26,10 @@
 
     // Para que se vean bien las tablas. Inicializa la tabla como table_id
     $(document).ready( function () {
-<<<<<<< HEAD
         var t = $('#table_id').DataTable( {
         // Traducción
         language: {
             search: "Búsqueda por nombre:",
-=======
-        $('#table_id').DataTable( {
-        // Traducción
-        language: {
-            search: "Búsqueda en la tabla:",
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
             paginate: {
                 first:      "Primero",
                 previous:   "Anterior",
@@ -44,7 +37,6 @@
                 last:       "Último"
             },
             info:           "Nº total de camadas encontradas: _TOTAL_.", /*_START_ - _END_*/
-<<<<<<< HEAD
             lengthMenu:     "Mostrar  _MENU_  camadas",
             infoFiltered:   " (de _MAX_ camadas en total)",
         },
@@ -73,12 +65,6 @@
     } ).draw();
 });
 
-=======
-            lengthMenu:    "Mostrar  _MENU_  camadas",
-        }
-    } );
-    });
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
 
 /* Para que un elemento del panel de navegación cambie si está activo */
 

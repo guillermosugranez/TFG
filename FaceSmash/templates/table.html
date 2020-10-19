@@ -8,10 +8,7 @@
 </script>
 
 <div class="container-fluid" id="table-container-main">
-<<<<<<< HEAD
     <!-- Búsqueda -->
-=======
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
     <div class="container border rounded" id="table-container-left">
         <h2 id="table-h2-0">Búsqueda</h2>
         <!-- MUY IMPORTANTE que action=search para poder hacer la búsqueda-->
@@ -43,7 +40,6 @@
             </div>
         </form>
     </div>
-<<<<<<< HEAD
 
     <!-- Datos -->
     <div class="container-fluid border rounded" id="table-container-right">
@@ -52,13 +48,6 @@
             <!-- Nav -->
             <div class="sticky-top container-fluid" id="table-container-nav">
                 <ul class="nav nav-tabs nav-justified " id="table-nav">
-=======
-    <!-- Nav -->
-    <div class="container-fluid" id="table-container-right">
-        {% if elementos_cabecera %}
-            <div class="sticky-top container-fluid" id="table-container-nav">
-                <ul class="nav nav-tabs nav-justified border rounded" id="table-nav">
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
                     <li class="nav-item">
                         <a id="nav-table" class="nav-link active" href="#" onclick="mostrar_nav_table()"><strong>Tabla</strong></a>
                     </li>
@@ -70,7 +59,6 @@
                     </li>
                 </ul>
             </div>
-<<<<<<< HEAD
 
             <!-- Tabla -->
             <div class="container-fluid" id="table-container-table">
@@ -80,24 +68,13 @@
                             <th></th>
                             {% for campo in elementos_cabecera %}
                                 <th style="text-align: center !important; text-transform: capitalize !important;">{{ campo }}</th>
-=======
-            <div class="container-fluid" id="table-container-table">
-                <table id="table_id" class="display">
-                    <thead>
-                        <tr>
-                            {% for campo in elementos_cabecera %}
-                                <th>{{ campo }}</th>
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
                             {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for fila in elementos_fila %}
                             <tr>
-<<<<<<< HEAD
                                 <td></td>
-=======
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
                                 {% for elemento in fila %}
                                     <td>{{ elemento }}</td>
                                 {% endfor %}
@@ -106,7 +83,6 @@
                     </tbody>
                 </table>
             </div>
-<<<<<<< HEAD
 
             <!-- Estadísticas -->
             <div class="container-fluid" id="table-container-stats" style="display: none;">
@@ -118,14 +94,6 @@
                 <p>graphics</p>
             </div>
 
-=======
-            <div class="container-fluid" id="table-container-stats" style="display: none;">
-                <p>stats</p>
-            </div>
-            <div class="container-fluid" id="table-container-graphics" style="display: none;">
-                <p>graphics</p>
-            </div>
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
         {% endif %}
     </div>
 </div>

@@ -58,7 +58,6 @@ def admin_loader():
     admin.add_view(ModelView(models.Provincia))
 
 
-
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
@@ -502,11 +501,7 @@ def search():
     if(condicion):
         del table['medicamentos']
 
-<<<<<<< HEAD
     # print(table)
-=======
-    print(table)
->>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
 
     for llave in table:
         if(llave in CONFIGURACION['campos_mostrados']):
@@ -515,8 +510,6 @@ def search():
     print(elementos_cabecera)
 
     # print(elementos_cabecera)
-
-    print(elementos_cabecera)
 
     for i in table.index:
         lista_auxiliar = []
