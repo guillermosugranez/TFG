@@ -1,5 +1,9 @@
 
+<<<<<<< HEAD
         /* contenedor principal */
+=======
+        /* table-container-main */
+>>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
 #table-container-main {
     height: 100%;
     width: 100%;
@@ -8,6 +12,7 @@
     background: white;
 }
 
+<<<<<<< HEAD
 
         /* Búsqueda */
 #table-container-left {
@@ -20,16 +25,79 @@
 }
 
         /* Cabecera de búsqueda */
+=======
+
+        /* Search*/
+#table-container-left {
+    width: 20%;
+    /*background: blue;*/
+    min-width: 300px;
+    margin-right: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+
+        /* Container-right */
+#table-container-right {
+    width: 80%;
+    /*background: yellow;*/
+    overflow: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+
+        /* nav */
+#table-container-nav {
+    width: 100%;
+    margin-bottom: 2%;
+    top: 0;
+    left: 0;
+    background: white;
+}
+
+        /* table */
+#table-container-table {
+    width: 100%;
+
+    overflow: auto;
+    /*background: yellow;*/
+}
+
+
+        /* stats */
+#table-container-stats {
+    width: 100%;
+    background: red;
+    padding: 1%;
+}
+
+
+        /* graphics */
+#table-container-graphics {
+    width: 100%;
+    background: blue;
+    padding: 1%;
+}
+
+
+        /*h2*/
+>>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
 #table-h2-0 {
     text-align: center;
     padding: 10%;
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
         /* Cambiar color a los elementos del nav */
 #nav-table {
     color: green;
     font-weight: bold;
+<<<<<<< HEAD
 }
 
 .nav-item > a {
@@ -72,6 +140,12 @@
     width: 100%;
     background: red;
     padding: 1%;
+=======
+}
+
+.nav-item > a {
+  color: grey;
+>>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
 }
 
 
@@ -85,12 +159,17 @@
 
 /*=============================== Data Table ================================*/
 
+<<<<<<< HEAD
 #table_id tr {
     white-space:nowrap !important;
     font-size: 16px !important;
     text-transform: capitalize !important;
     text-align: center !important;
 }
+=======
+
+
+>>>>>>> 4dfb9407a0ac2648d1d6f045ca918b1beac6cc1f
 /*
  * Table styles
  */
