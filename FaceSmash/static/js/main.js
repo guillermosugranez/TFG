@@ -1,3 +1,5 @@
+
+/*
 var nav = document.querySelectorAll('.main nav a');
 for (var num in nav) {
     try {
@@ -8,7 +10,8 @@ for (var num in nav) {
             link.classList.toggle('current', false);
         }
     } catch (e) {
-        
+
     }
 }
 disTime(0);
+*/

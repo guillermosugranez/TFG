@@ -2,8 +2,13 @@
 
 {% block content %}
 
+<!--Se activa la sección "Análisis"-->
+<script type="text/javascript">
+        document.getElementById('ref-anlysis').classList.add("active");
+</script>
+
 <div class="container-fluid" id="table-container-main">
-    <div class="container-fluid border rounded" id="table-container-left-0">
+    <div class="container border rounded" id="table-container-left">
         <h2 id="table-h2-0">Búsqueda</h2>
         <!-- MUY IMPORTANTE que action=search para poder hacer la búsqueda-->
         <form id="table-form" class="form container-fluid" action="search" method="post">
@@ -32,39 +37,48 @@
             </div>
         </form>
     </div>
-    <div class="container-fluid border rounded" id="table-container-right-0">
+    <!-- Nav -->
+    <div class="container-fluid" id="table-container-right">
         {% if elementos_cabecera %}
-            <div class="container" style="margin-bottom: 3%; margin-top: 1%">
-                <ul class="nav nav-tabs nav-justified">
+            <div class="sticky-top container-fluid" id="table-container-nav">
+                <ul class="nav nav-tabs nav-justified border rounded" id="table-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#" style="color: black">Active</a>
+                        <a id="nav-table" class="nav-link active" href="#" onclick="mostrar_nav_table()"><strong>Tabla</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" style="color: black">Link</a>
+                        <a id="nav-stats" class="nav-link" href="#" onclick="mostrar_nav_stats()"><strong>Estadísticas</strong></a>
                     </li>
                     <li class="nav-item text-dark">
-                        <a class="nav-link" href="#" style="color: black">Link</a>
+                        <a id="nav-graphics" class="nav-link" href="#" onclick="mostrar_nav_graphics()"><strong>Gráficos</strong></a>
                     </li>
                 </ul>
             </div>
-            <table id="table_id" class="display">
-                <thead>
-                    <tr>
-                        {% for campo in elementos_cabecera %}
-                            <th>{{ campo }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fila in elementos_fila %}
+            <div class="container-fluid" id="table-container-table">
+                <table id="table_id" class="display">
+                    <thead>
                         <tr>
-                            {% for elemento in fila %}
-                                <td>{{ elemento }}</td>
+                            {% for campo in elementos_cabecera %}
+                                <th>{{ campo }}</th>
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for fila in elementos_fila %}
+                            <tr>
+                                {% for elemento in fila %}
+                                    <td>{{ elemento }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="container-fluid" id="table-container-stats" style="display: none;">
+                <p>stats</p>
+            </div>
+            <div class="container-fluid" id="table-container-graphics" style="display: none;">
+                <p>graphics</p>
+            </div>
         {% endif %}
     </div>
 </div>

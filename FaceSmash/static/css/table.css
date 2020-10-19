@@ -1,31 +1,68 @@
 
-
-    /* table-container-main */
+        /* table-container-main */
 #table-container-main {
     height: 100%;
     width: 100%;
     display: flex;
     flex-direction: row;
     background: white;
+}
+
+
+        /* Search*/
+#table-container-left {
+    width: 20%;
+    /*background: blue;*/
+    min-width: 300px;
+    margin-right: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+
+        /* Container-right */
+#table-container-right {
+    width: 80%;
+    /*background: yellow;*/
+    overflow: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+
+        /* nav */
+#table-container-nav {
+    width: 100%;
+    margin-bottom: 2%;
+    top: 0;
+    left: 0;
+    background: white;
+}
+
+        /* table */
+#table-container-table {
+    width: 100%;
+
+    overflow: auto;
+    /*background: yellow;*/
+}
+
+
+        /* stats */
+#table-container-stats {
+    width: 100%;
+    background: red;
     padding: 1%;
 }
 
-        /* Search*/
-#table-container-left-0 {
-    height: 100%;
-    width: 25%;
-    //background: blue;
-    margin-right: 1%;
+
+        /* graphics */
+#table-container-graphics {
+    width: 100%;
+    background: blue;
+    padding: 1%;
 }
 
-        /* Table */
-#table-container-right-0 {
-    height: 100%;
-    width: 75%;
-    //background: yellow;
-    overflow: scroll;
-    padding: 1%
-}
 
         /*h2*/
 #table-h2-0 {
@@ -33,20 +70,19 @@
     padding: 10%;
 }
 
-        /* Botones de navegación */
-#table-boton-tablas {
-    color: black;
+        /* Cambiar color a los elementos del nav */
+#nav-table {
+    color: green;
+    font-weight: bold;
 }
 
-#table-boton-analisis {
-    color: black;
-}
-
-#table-boton-graficos {
-    color: black;
+.nav-item > a {
+  color: grey;
 }
 
 /*=============================== Data Table ================================*/
+
+
 
 /*
  * Table styles

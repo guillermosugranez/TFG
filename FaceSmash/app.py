@@ -47,6 +47,7 @@ def admin_loader():
     admin.add_view(ModelView(models.Integrado))
     admin.add_view(ModelView(models.Camada))
 
+
 # Se utiliza entre otras cosas para diferenciar esta app de otras en la web.
 # Usar cualquier cadena, cuyos caracteres sean variados y aleatorios
 
@@ -453,8 +454,17 @@ def search():
 
     table = search_function(query_params)
 
+    condicion = True
+
+    if(condicion):
+        del table['medicamentos']
+
+    print(table)
+
     for llave in table:
         elementos_cabecera.append(llave)
+
+    print(elementos_cabecera)
 
     for i in table.index:
         lista_auxiliar = []
