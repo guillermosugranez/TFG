@@ -3,6 +3,7 @@
 
         // Mostrar tabla
     function mostrar_nav_table(){
+        //document.getElementById('table-variable-selector').style.display="none";
         document.getElementById('table-container-stats').style.display="none";
         document.getElementById('table-container-graphics').style.display="none";
         document.getElementById('table-container-table').style.display="block";
@@ -12,6 +13,7 @@
     function mostrar_nav_stats(){
         document.getElementById('table-container-table').style.display="none";
         document.getElementById('table-container-graphics').style.display="none";
+        //document.getElementById('table-variable-selector').style.display="block";
         document.getElementById('table-container-stats').style.display="block";
     }
 
@@ -19,6 +21,7 @@
     function mostrar_nav_graphics(){
         document.getElementById('table-container-table').style.display="none";
         document.getElementById('table-container-stats').style.display="none";
+        //document.getElementById('table-variable-selector').style.display="block";
         document.getElementById('table-container-graphics').style.display="block";
     }
 
@@ -76,6 +79,14 @@
             $(this).css({"color" : "green"});
         });
     });
+
+    $(document).ready( function () {
+        document.getElementById('table_id').style.margin=0;
+    } );
+//
+//    $(document).ready( function () {
+//        $('.dataTables_scrollBody').addClass("container-fluid");
+//    } );
 /*
 $('#table_id').DataTable( {
     language: {

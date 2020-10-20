@@ -33,12 +33,13 @@ PORT = 8000
 HOST = '0.0.0.0'
 UPLOAD_FOLDER = os.getcwd() + '/make_dataset/import_data'
 ALLOWED_EXTENSIONS = {'xlsx'}
+
 CONFIGURACION = {
     'provincias'        : ['huelva', 'sevilla', 'badajoz', 'cordoba'],
     'tecnicos'          : ['carlos', 'sandra', 'eduardo'],
     'fabricas'          : ['nuter', 'picasat'],
     # 'nombre_integrado'  : ["AGROGANADERA MORANDOM", "JOSE MANUEL ROMERO MOLIN", "JUANA LOPEZ GUTIERREZ", "HNOS ALCAIDE, C.B.", "EDUARDO MARTÍN MARTÍN", "DEHESA LA ROTURA", "AGROGANADERA PINARES, SC", "HERMANOS CARRERO REYES, SC", "MIGUEL ANGEL GARRIDO TABODA", "DANIEL GALLARDO RODRIGUEZ", "AVES EL SAUCEJO, S.L.", "MANUEL PADILLA GARCÍA", "LUCAS REBOLLO ORTIZ", "JOSE ANTONIO BANDO MUÑOZ", "EXP.AGROPECUARIAS RIVERA DE HUELVA, S.L.", "CRISTOBAL MONCAYO HORMIGO", "DIEGO J. DOMINGUEZ ALBA", "JUAN LOPEZ GUTIERREZ", "ANTONIO CARDENAS BERLANGA", "JOSE DOMINGO SUAREZ LAVADO", "FRANCISCO JOSE CAMACHO SALAS", "VICTORINO RUBIO BRAVO", "BLAS ROMAN POVEA (INTEGRACION)", "BLAS ROMAN POVEA", "ALONSO ROBLES MORENO", "LOPEZ SOLTERO, SCA", "AGRICOLA HEREDIA MORENO, SC", "JUAN MANUEL CORONA RUEDA", "MJC. NARANJO RODIGUEZ,  SL", "LUIS ALFONSO VAZQUEZ", "MARIA DOLORES DOMINGUEZ GONZALEZ", "ROSARIO MINERO ", "CRISTAL RONCERO GONZÁLEZ", "AVEPRA, SL ", "AGROAVI PÉREZ VIDES", "MANUEL POVEA CARRASCO", "ENCARNACIÓN CLAVERO", "JUAN FERIA (FINCA VILLARAMOS)", "MARIA ISABEL MACIAS GARCIA", "MIGUEL ROSA BLANCO", "CONCEPCION MORATA ESTEPA", "CARMEN REAL ESTEBAN", "AVICOLA VALDELIMONES, S.L.", "FELIPE CALVENTE ROMERO", "MARIA VAZQUEZ RAMOS", "TEODORA DOMÍNGUEZ", "GONAN AVICULTURA, C.B.", "ISABEL CONTRERAS DOMINGUEZ", "JUAN SOSA CARMONA", "MANUEL CRUZ GARRIDO", "RICARDO SÁNCHEZ", "GONZALEZ MEJIAS E HIJOS, S.L.", "GENMA ORTIZ VAZQUEZ", "DEHESA SAN JUAN, SA", "RAUL ORTEGA JUAN", "MARIA JOSE RUIZ MOLINA", "GONAN AVICULTURA", "HNOS MATEOS, SCA", "ANTONIO VEGA PÉREZ", "BERNARDINO ROMERO, SL ", "LA PARRILLA 2000, SL"],
-    'campos_mostrados'  : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria'],
+    'variables'         : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria'],
     'poblaciones'       : ["la nava", "cartaya", "los corrales", "aracena", "santa ana la real", "escacema del campo", "fuentes de león", "villanueva de san juan", "nerva", "martin de la jara", "la palma del condado", "aljaraque", "san juan del puerto", "almonte", "bollullos del condado", "fuente de leon", "el saucejo", "barbara de casas", "pedrera", "tocina", "san silvestre de guzman", "almonaster la real", "trigueros", "valverde del camino", "jerez de los caballeros", "santa eufemia", "campofrio", "carboneras", "lepe", "segura de leon", "bellavista", "la puebla de los infantes", "moguer", "el patras", "monesterio", "castillo de las guardas", "villamanrique de la condesa", "pilas", "valdezufre"]
 }
 
@@ -49,11 +50,11 @@ app.secret_key = 'kaAsn4oeiASDL13JKHsdrjv<sklnv´lsjdAsCaxcAv'  # Llave Secreta.
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Administración
-app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'  # Tema para la administracion
+app.config['FLASK_ADMIN_SWATCH'] = 'slate'  # Tema para la administracion
 admin = Admin(app, name='Poultry Geek', template_mode='bootstrap3')
 
 def admin_loader():
-    admin.add_view(ModelView(models.User))
+    # admin.add_view(ModelView(models.User))
     admin.add_view(ModelView(models.Integrado))
     admin.add_view(ModelView(models.Camada))
     admin.add_view(ModelView(models.Tecnico))
@@ -301,16 +302,17 @@ def dataset_to_bd(dataframe):
     """Procesa la información de un dataset y trata de guardarla en la bbdd"""
 
     d = dataframe.to_dict('index')
-    
+
     for registro in d:
 
         registro_valido = True
 
         # Se validan los datos. Si falla salta el registro:
-        registro_valido = registro_valido * check_provincia(d[registro]['Provincia'])
-        registro_valido = registro_valido * check_tecnico(d[registro]['Técnico'])
-        registro_valido = registro_valido * check_fabrica(d[registro]['Fab. Pienso'])
-        registro_valido = registro_valido * check_poblacion(d[registro]['Población'])
+        registro_valido = registro_valido\
+                          * check_provincia(d[registro]['Provincia'])\
+                          * check_tecnico(d[registro]['Técnico'])\
+                          * check_fabrica(d[registro]['Fab. Pienso'])\
+                          * check_poblacion(d[registro]['Población'])
 
         if(registro_valido):
 
@@ -491,13 +493,25 @@ def stream(username=None):
 #     return query_params
 
 def search_function(query_params):
-    """Devuelve un dataframe con la consulta realizada
-        1) Se establece configuración
-    """
+    """Devuelve un dataframe con la consulta realizada"""
 
-    query = models.Camada.select().where(
-        query_params["desde"] > models.Camada.fecha < query_params["hasta"]
-    )
+    # print("el avicultor es:", query_params["avicultor"])
+
+    if query_params["avicultor"] == "Todos":
+        query = models.Camada.select().where(
+            query_params["desde"] > models.Camada.fecha < query_params["hasta"]
+        )
+    else:
+        query = (models.Camada
+            .select(models.Camada, models.Integrado)
+            .join(models.Integrado)
+            .group_by(models.Camada.codigo_camada)
+            .where(
+                (query_params["desde"] > models.Camada.fecha < query_params["hasta"]) &
+                (query_params["avicultor"] == models.Camada.integrado.nombre_integrado) &
+                (models.Camada.integrado == models.Integrado.nombre_integrado)
+            )
+        )
 
     df_query = pd.DataFrame(list(query.dicts()))
 
@@ -517,32 +531,86 @@ def search():
     query_params = {
         "desde": "2015-01-01",
         "hasta": "2015-01-30",
-        "num": 1
+        "num": 1,
+        "avicultor": "Todos",
+        "variables": ['integrado', 'pollos_entrados', 'pollos_salidos',
+                      'porcentaje_bajas', 'kilos_carne', 'kilos_pienso',
+                      'peso_medio', 'indice_transformacion', 'retribucion',
+                      'medicamentos_por_pollo', 'dias_media_retirada',
+                      'ganancia_media_diaria'],
+        "ch_variables" :   {
+                'integrado' : "on",
+                'pollos_entrados' : "on",
+                'pollos_salidos' : "on",
+                'porcentaje_bajas' : "on",
+                'kilos_carne' : "on",
+                'kilos_pienso' : "on",
+                'peso_medio' : "on",
+                'indice_transformacion' : "on",
+                'retribucion' : "on",
+                'medicamentos_por_pollo' : "on",
+                'dias_media_retirada' : "on",
+                'ganancia_media_diaria' : "on",
+            }
     }
 
     elementos_cabecera = []
     elementos_fila = []
     user = current_user
 
-    query_params["num"] = request.form["num"]
+    # query_params["num"] = request.form["num"]
     query_params["desde"] = request.form["desde"]
     query_params["hasta"] = request.form["hasta"]
+    query_params["avicultor"] = request.form["avicultor"]
+
+    # print("queryparams antes: ", query_params["ch_variables"]["pollos_entrados"])
+
+    for variable in query_params["ch_variables"]:
+        query_params["ch_variables"][variable] = request.form.get(
+            "ch_" + variable)
+
+    # print("queryparams despues: ",
+    #       query_params["ch_variables"]["pollos_entrados"])
+
+    # print("form: ", request.form.get("ch_pollos_entrados"))
 
     table = search_function(query_params)
 
-    # print(table)
+    # Aquí selecciono las variables a mostrar según el formulario en una lista
+    variables_mostradas = []
+
+    for variable in CONFIGURACION['variables']:
+        if request.form.get("ch_" + variable) == "on":
+            variables_mostradas.append(variable)
+        else:
+            # print("desactivado: ", variable)
+            if variable in variables_mostradas:
+                variables_mostradas.remove(variable)
 
     for llave in table:
-        if(llave in CONFIGURACION['campos_mostrados']):
+        if(llave in variables_mostradas):
             elementos_cabecera.append(llave.replace("_", " "))
 
-    print(elementos_cabecera)
+    estadisticas = {
+        "medias"                : [],
+        "desviaciones_tipicas"  : []
+    }
+
+    for variable in variables_mostradas:
+        if variable != "integrado": # no es una variable numérica
+            # print("La media de " + variable + " es: ", table[variable].mean())
+            estadisticas["medias"].append(table[variable].mean())
+            estadisticas["desviaciones_tipicas"].append(table[variable].std())
+
+    print(estadisticas)
+
+    # print(elementos_cabecera)
 
     # print(elementos_cabecera)
 
     for i in table.index:
         lista_auxiliar = []
-        for campo in CONFIGURACION['campos_mostrados']:
+        for campo in variables_mostradas:
             # Porcentaje
             if campo == 'porcentaje_bajas':
                 valor = "{} %".format(round((table[campo][i] * 100), 2))
@@ -561,7 +629,8 @@ def search():
         # Se añade la fila
         elementos_fila.append(lista_auxiliar)
 
-
+    # Coger el nombre de los avicultores disponible
+    avicultores = models.Integrado.select(models.Integrado.nombre_integrado).execute()
 
     # print(request.form["num"])
 
@@ -570,7 +639,9 @@ def search():
                            elementos_fila=elementos_fila,
                            query_params=query_params,
                            user=user,
-                           form=request.form
+                           avicultores=avicultores,
+                           form=request.form,
+                           estadisticas=estadisticas,
                            )
 
 @login_required
@@ -589,11 +660,36 @@ def show_table():
     #                          'chemistry': [84, 56, 73, 69, 48],
     #                          'algebra': [78, 88, 82, 87, 98]})
 
+    # Default query_params
+    # Default query_params
     query_params = {
         "desde": "2015-01-01",
         "hasta": "2015-01-30",
-        "num": 1
+        "num": 1,
+        "avicultor": "Todos",
+        "variables": ['integrado', 'pollos_entrados', 'pollos_salidos',
+                      'porcentaje_bajas', 'kilos_carne', 'kilos_pienso',
+                      'peso_medio', 'indice_transformacion', 'retribucion',
+                      'medicamentos_por_pollo', 'dias_media_retirada',
+                      'ganancia_media_diaria'],
+        "ch_variables" :   {
+                'integrado' : "on",
+                'pollos_entrados' : "on",
+                'pollos_salidos' : "on",
+                'porcentaje_bajas' : "on",
+                'kilos_carne' : "on",
+                'kilos_pienso' : "on",
+                'peso_medio' : "on",
+                'indice_transformacion' : "on",
+                'retribucion' : "on",
+                'medicamentos_por_pollo' : "on",
+                'dias_media_retirada' : "on",
+                'ganancia_media_diaria' : "on",
+            }
     }
+
+    avicultores = models.Integrado.select(
+        models.Integrado.nombre_integrado).execute()
 
     form = forms.SearchForm()
 
@@ -608,7 +704,8 @@ def show_table():
     else:
         return render_template('table.html',
                                form=form,
-                               query_params=query_params
+                               query_params=query_params,
+                               avicultores=avicultores
                                )
 
 

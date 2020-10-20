@@ -8,6 +8,11 @@
     background: white;
 }
 
+        /* Cabecera de búsqueda */
+#table-h2-0 {
+    text-align: center;
+    padding: 10%;
+}
 
         /* Búsqueda */
 #table-container-left {
@@ -19,10 +24,9 @@
     margin-bottom: 1%;
 }
 
-        /* Cabecera de búsqueda */
-#table-h2-0 {
-    text-align: center;
-    padding: 10%;
+#table-variable-selector{
+    //display: none; /* Por defecto no se muestra */
+    padding: 5%;
 }
 
 
@@ -70,8 +74,10 @@
         /* Estadísticas */
 #table-container-stats {
     width: 100%;
-    background: red;
-    padding: 1%;
+    /*background: red;*/
+    padding: 2%;
+    text-align: center;
+    align: center;
 }
 
 
@@ -91,6 +97,14 @@
     text-transform: capitalize !important;
     text-align: center !important;
 }
+
+.dataTables_scrollHead{
+    text-align: center;
+}
+
+.dataTables_scrollBody{
+}
+
 /*
  * Table styles
  */

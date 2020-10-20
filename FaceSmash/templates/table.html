@@ -14,29 +14,67 @@
         <!-- MUY IMPORTANTE que action=search para poder hacer la búsqueda-->
         <form id="table-form" class="form container-fluid" action="search" method="post">
             <div class="form-group">
+
+                <!-- Desde -->
                 <div class="form-group row">
-                    <label for="form-table-desde" class="col col-form-label">Desde</label>
+                    <label for="form-table-desde" class="col col-form-label"><strong>Desde:</strong></label>
                     <div class="col">
                         <input class="form-control" name="desde" type="date" value="{{ query_params.desde }}" id="form-table-desde">
                     </div>
                 </div>
+
+                <!-- Hasta -->
                 <div class="form-group row">
-                    <label for="form-table-hasta" class="col col-form-label">Hasta</label>
+                    <label for="form-table-hasta" class="col col-form-label"><strong>Hasta:</strong></label>
                     <div class="col">
                         <input class="form-control" name="hasta" type="date" value="{{ query_params.hasta }}" id="form-table-hasta">
                     </div>
                 </div>
+
+                <!-- Number -->
+<!--                <div class="form-group row">-->
+<!--                    <label for="form-table-number" class="col col-form-label"><strong>Number:</strong></label>-->
+<!--                    <div class="col">-->
+<!--                        <input class="form-control" name="num" type="number" value="{{ query_params.num }}" id="form-table-number">-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <!-- Avicultor -->
                 <div class="form-group row">
-                    <label for="form-table-number" class="col col-form-label">Number</label>
+                    <label for="form-table-avicultor" class="col col-form-label"><strong>Avicultor:</strong></label>
                     <div class="col">
-                        <input class="form-control" name="num" type="number" value="{{ query_params.num }}" id="form-table-number">
+                        <select class="form-control container" name="avicultor" type="text" id="form-table-avicultor" style="width: 250px;">
+                            <option>Todos</option>
+                            {% if query_params.avicultor != "Todos" %}
+                                <option selected>{{ query_params.avicultor }}</option>
+                            {% endif %}
+                            {% for avicultor in avicultores %}
+                                <option>{{ avicultor }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
 
-                <!-- Buscar -->
+                <div class="form-group row" id="table-variable-selector">
+
+                    {% for variable in query_params.variables %}
+                            <div class="form-check" style="width: 100%" id="table-chek-{{variable}}">
+                                <!-- Para que no desaparezca el estado del check cuando buscas-->
+                                {% if query_params.ch_variables[variable] == 'on' %}
+                                    <input class="form-check-input" data="True" name="ch_{{variable}}" for="table-chek-{{variable}}" type="checkbox" checked>
+                                {% else %}
+                                    <input class="form-check-input" data="True" name="ch_{{variable}}" for="table-chek-{{variable}}" type="checkbox">
+                                {% endif %}
+                                <label class="form-check-label">{{variable}}</label>
+                            </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Botón Buscar -->
                 <div class="form-group row container-fluid justify-content-center">
                     <button type="submit" class="btn btn-dark text-white btn-md">Buscar</button>
                 </div>
+
             </div>
         </form>
     </div>
@@ -61,13 +99,13 @@
             </div>
 
             <!-- Tabla -->
-            <div class="container-fluid" id="table-container-table">
+            <div class="container-fluid justify-content-start" id="table-container-table">
                 <table id="table_id" class="display nowarp">
                     <thead>
                         <tr>
                             <th></th>
                             {% for campo in elementos_cabecera %}
-                                <th style="text-align: center !important; text-transform: capitalize !important;">{{ campo }}</th>
+                                <th style="text-transform: capitalize;">{{ campo }}</th>
                             {% endfor %}
                         </tr>
                     </thead>
@@ -85,8 +123,33 @@
             </div>
 
             <!-- Estadísticas -->
-            <div class="container-fluid" id="table-container-stats" style="display: none;">
-                <p>stats</p>
+            <div class="container-fluid justify-content-center" id="table-container-stats" style="display: none;">
+                <table class="table table-bordered mx-auto" style="width: auto;">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Media</th>
+                            <th scope="col">Desviación Típica</th>
+<!--                            <th scope="col">Moda</th>-->
+<!--                            <th scope="col">Varianza</th>-->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variable in query_params.variables %}
+                            {% if variable != "integrado" %}
+                                {% if query_params.ch_variables[variable] == 'on' %}
+                                <tr>
+                                    <th scope="row" style="text-transform: capitalize;">{{variable.replace("_", " ")}}</th>
+                                    <td>Mark</td>
+                                    <td>Mark</td>
+<!--                                    <td>Otto</td>-->
+<!--                                    <td>@mdo</td>-->
+                                </tr>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
             <!-- Gráficos -->

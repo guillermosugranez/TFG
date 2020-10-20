@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, PasswordField, TextAreaField, FileField, DateField,
-    IntegerField
+    IntegerField, BooleanField
 )
 from wtforms.validators import (  # Validadores para los formularios
     DataRequired, ValidationError, Email, Regexp, Length, EqualTo
@@ -24,10 +24,6 @@ def email_exists(form, field):
         # Raise lanza un error de validación si el usuario ya existe
         raise ValidationError("Ya existe un usuario con ese eMail")
 
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ==============================================================================
 
@@ -89,9 +85,22 @@ class SearchForm(FlaskForm):
     """Formulario para la busqueda en la sección de analisis de datos"""
 
     num = IntegerField('num', validators=[DataRequired()])
+    avicultor = StringField('avicultor', validators=[DataRequired()])
 
     desde = DateField("desde", format="%d-%m-%Y", validators=[DataRequired()])
     hasta = DateField("hasta", format="%d-%m-%Y", validators=[DataRequired()])
+
+    ch_pollos_entrados = BooleanField("ch_pollos_entrados", default="on", validators=[DataRequired()])
+    ch_pollos_salidos = BooleanField("ch_pollos_salidos", validators=[DataRequired()])
+    ch_porcentaje_bajas = BooleanField("ch_porcentaje_bajas", validators=[DataRequired()])
+    ch_kilos_carne = BooleanField("ch_kilos_carne", validators=[DataRequired()])
+    ch_kilos_pienso = BooleanField("ch_kilos_pienso", validators=[DataRequired()])
+    ch_peso_medio = BooleanField("ch_peso_medio", validators=[DataRequired()])
+    ch_indice_transformacion = BooleanField("ch_indice_transformacion", validators=[DataRequired()])
+    ch_retribucion = BooleanField("ch_retribucion", validators=[DataRequired()])
+    ch_medicamentos_por_pollo = BooleanField("ch_medicamentos_por_pollo", validators=[DataRequired()])
+    ch_dias_media_retirada = BooleanField("ch_dias_media_retirada", validators=[DataRequired()])
+    ch_ganancia_media_diaria = BooleanField("ch_ganancia_media_diaria", validators=[DataRequired()])
 
     # email = StringField('Email', validators=[DataRequired(), Email()])
     # password = PasswordField('Password', validators=[DataRequired()])
