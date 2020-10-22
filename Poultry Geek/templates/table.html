@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<!--Se activa la sección "Análisis"-->
+<script type="text/javascript">
+        document.getElementById('ref-anlysis').classList.add("active");
+</script>
+
+<div class="container-fluid" id="table-container-main">
+    <!-- Búsqueda -->
+    <div class="container border rounded" id="table-container-left">
+        <h2 id="table-h2-0">Búsqueda</h2>
+        <!-- MUY IMPORTANTE que action=search para poder hacer la búsqueda-->
+        <form id="table-form" class="form container-fluid" action="search" method="post">
+            <div class="form-group">
+
+                <!-- Desde -->
+                <div class="form-group row">
+                    <label for="form-table-desde" class="col col-form-label"><strong>Desde:</strong></label>
+                    <div class="col">
+                        <input class="form-control" name="desde" type="date" value="{{ query_params.desde }}" id="form-table-desde">
+                    </div>
+                </div>
+
+                <!-- Hasta -->
+                <div class="form-group row">
+                    <label for="form-table-hasta" class="col col-form-label"><strong>Hasta:</strong></label>
+                    <div class="col">
+                        <input class="form-control" name="hasta" type="date" value="{{ query_params.hasta }}" id="form-table-hasta">
+                    </div>
+                </div>
+
+                <!-- Number -->
+<!--                <div class="form-group row">-->
+<!--                    <label for="form-table-number" class="col col-form-label"><strong>Number:</strong></label>-->
+<!--                    <div class="col">-->
+<!--                        <input class="form-control" name="num" type="number" value="{{ query_params.num }}" id="form-table-number">-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <!-- Avicultor -->
+                <div class="form-group row">
+                    <label for="form-table-avicultor" class="col col-form-label"><strong>Avicultor:</strong></label>
+                    <div class="col">
+                        <select class="form-control container" name="avicultor" type="text" id="form-table-avicultor" style="width: 250px;">
+                            <option>Todos</option>
+                            {% if query_params.avicultor != "Todos" %}
+                                <option selected>{{ query_params.avicultor }}</option>
+                            {% endif %}
+                            {% for avicultor in avicultores %}
+                                <option>{{ avicultor }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Selector de variables -->
+                <div class="form-group row" id="table-variable-selector">
+                    {% for variable in query_params.variables %}
+                            <div class="form-check" style="width: 100%" id="table-chek-{{variable}}">
+                                <!-- Para que no desaparezca el estado del check cuando buscas-->
+                                {% if query_params.ch_variables[variable] == 'on' %}
+                                    <input class="form-check-input" data="True" name="ch_{{variable}}" for="table-chek-{{variable}}" type="checkbox" checked>
+                                {% else %}
+                                    <input class="form-check-input" data="True" name="ch_{{variable}}" for="table-chek-{{variable}}" type="checkbox">
+                                {% endif %}
+                                <label class="form-check-label">{{variable}}</label>
+                            </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Botón Buscar -->
+                <div class="form-group row container-fluid justify-content-center">
+                    <button type="submit" class="btn btn-dark text-white btn-md">Buscar</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- Datos -->
+    <div class="container-fluid border rounded" id="table-container-right">
+        {% if elementos_cabecera %}
+
+            <!-- Nav -->
+            <div class="sticky-top container-fluid" id="table-container-nav">
+                <ul class="nav nav-tabs nav-justified " id="table-nav">
+                    <li class="nav-item">
+                        <a id="nav-table" class="nav-link active" href="#" onclick="mostrar_nav_table()"><strong>Tabla</strong></a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="nav-stats" class="nav-link" href="#" onclick="mostrar_nav_stats()"><strong>Estadísticas</strong></a>
+                    </li>
+                    <li class="nav-item text-dark">
+                        <a id="nav-graphics" class="nav-link" href="#" onclick="mostrar_nav_graphics()"><strong>Gráficos</strong></a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tabla -->
+            <div class="container-fluid justify-content-start" id="table-container-table">
+                <table id="table_id" class="display nowarp">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            {% for campo in elementos_cabecera %}
+                                <th style="text-transform: capitalize;">{{ campo }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for fila in elementos_fila %}
+                            <tr>
+                                <td></td>
+                                {% for elemento in fila %}
+                                    <td>{{ elemento }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="container-fluid justify-content-center" id="table-container-stats" style="display: none;">
+                <table id="table_stats" class="table table-bordered mx-auto display nowarp" style="width: auto;" >
+                    <thead>
+                        <tr>
+<!--                            <th scope="col" style="display:none"></th>-->
+                            <th scope="col">{{query_params.desde + " / " +
+                                query_params.hasta}}</th>
+                            <th scope="col">Media</th>
+                            <th scope="col">Desviación Típica</th>
+<!--                            <th scope="col">Moda</th>-->
+<!--                            <th scope="col">Varianza</th>-->
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for variable in query_params.variables %}
+                            {% if variable != "integrado" %}
+                                {% if query_params.ch_variables[variable] == 'on' %}
+                                <tr>
+                                    <td scope="row" style="text-transform: capitalize;"><strong>{{variable.replace("_", " ")}}</strong></td>
+                                    {% for stat in estadisticas[variable] %}
+                                        <td>{{stat}}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="container-fluid justify-content-start collapse" id="table-container-graphics" style="display: none; ">
+                {% for variable in query_params.variables %}
+                    {% if query_params.ch_variables[variable] == 'on' and variable != "integrado" %}
+                        <div class="container border" style="display:flex; width:50%; height:auto; padding: 1%; justify-content: center;">
+<!--                            <img src="/graphics/media_{{variable}}.svg" alt="El mejor presidente de la historia">-->
+                            <img src="{{ url_for('download_file', filename='media_' + variable + '.svg') }}?{{url_variable}}" alt="grafico de media">
+
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

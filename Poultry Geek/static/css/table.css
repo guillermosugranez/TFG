@@ -1,0 +1,135 @@
+
+        /* contenedor principal */
+#table-container-main {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    background: white;
+}
+
+        /* Cabecera de búsqueda */
+#table-h2-0 {
+    text-align: center;
+    padding: 6%;
+    font-size: 25px
+}
+
+        /* Búsqueda */
+#table-container-left {
+    width: 20%;
+    /*background: blue;*/
+    min-width: 300px;
+    margin-right: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    overflow: auto;
+}
+
+#table-variable-selector{
+    //display: none; /* Por defecto no se muestra */
+    padding: 5%;
+}
+
+
+        /* Cambiar color a los elementos del nav */
+#nav-table {
+    color: green;
+    font-weight: bold;
+}
+
+.nav-item > a {
+  color: grey;
+}
+
+
+        /* Datos */
+#table-container-right {
+    width: 80%;
+    /*background: yellow;*/
+    overflow: auto;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    padding: 0;
+}
+
+
+        /* Navbar de datos */
+#table-container-nav {
+    width: 100%;
+    margin-bottom: 2%;
+    top: 0;
+    left: 0;
+    background: white;
+    padding: 0%;
+}
+
+
+        /* Tabla */
+#table-container-table {
+    width: 100%;
+    overflow: auto;
+    /*background: yellow;*/
+}
+
+
+        /* Estadísticas */
+#table-container-stats {
+    width: 100%;
+    /*background: red;*/
+    padding: 2%;
+    text-align: center;
+    align: center;
+    overflow: auto;
+}
+
+
+        /* Gráficos */
+#table-container-graphics {
+    width: 100%;
+    /*background: blue;*/
+    padding: 1%;
+    justify-content: start;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+
+/*=============================== Data Table ================================*/
+
+
+
+.buttons-print {
+    font-size: 16px !important;
+    font-family: 'Arial' !important; /* Cambia el tipo de fuente del boton imprimir */
+}
+
+#table_id tr {
+    white-space:nowrap !important; /* En una sola linea */
+    font-size: 16px !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
+}
+
+#table_stats {
+    margin-top: 35px;
+}
+
+#table_stats tr {
+    white-space:nowrap !important;
+    font-size: 16px !important;
+    text-transform: capitalize !important;
+    text-align: center !important;
+}
+
+.dataTables_scrollHead{
+    text-align: center;
+}
+
+.dataTables_scrollBody{
+}
+
+#table_id_length {
+    margin-top: 5px;
+    margin-left: 20px;
+}
