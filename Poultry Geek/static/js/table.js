@@ -43,12 +43,12 @@
             buttons: [
             {
                 extend: 'print',
-                text: 'Imprimir',
+                text: 'Imprimir',/*
                 exportOptions: {
                     modifier: {
                         page: 'current',
                     }
-                }
+                }*/
             },
             ],
 

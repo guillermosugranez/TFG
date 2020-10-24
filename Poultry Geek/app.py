@@ -35,8 +35,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-import models
+# Predicción
+from sklearn import linear_model
 
+# App
+import models
 import forms  # LoginForm, RegisterForm
 
 DEBUG = True  # Mayúsculas indica que es global (por convenio)
@@ -459,9 +462,55 @@ def load_data():
     return render_template('load_data.html', form=form)  # Vuelve a intentarlo
 
 
+
+
+def prediccion():
+    """
+    - Hay que hacer una consulta con todos los datos de toda la integracion
+    - se forma el dataset
+    - se cogen las medias de las 3 variables
+    -
+
+
+    """
+
+    # HACER LA TABLA
+
+    print("Prediccion:")
+
+    intervalo = 0
+    num_variables_ficticas = 5
+    nombre_variable = 'pollos_salidos'
+
+    m = [9, 8, 7, 7, 7, 5, 3, 5, 5, 6, 7, 4, 5, 7, 5, 4, 3, 5, 6, 7, 8, 5]
+    dataframe_medias = pd.DataFrame(m)
+
+    tabla = pd.DataFrame(m, columns=[nombre_variable])
+
+    # tabla = pd.DataFrame(medias, index=nombre_variable) # Lo convierto a DataSet
+    #
+    # print(tabla)
+    #
+    for i in range(num_variables_ficticas):
+        # indice = 'C' + str(i)
+        dataframe_medias = dataframe_medias.shift(periods=1)
+        tabla.insert(i+1,("t-" + str(i)), dataframe_medias)
+
+    print(tabla)
+    y = pd.DataFrame(m, columns=["y"])
+    y = y.shift(periods=-1)
+    # y.append(pd.DataFrame(np.nan))
+    print(y)
+
+    print("Fin Prediccion:")
+
+    pass
+
 @app.route('/')
 def index():
     """Vista principal. Muestra un timeline con los post de diferentes users"""
+
+    prediccion()
 
     # s = models.Post.select().limit(100)  # stream es el timeline
     # return render_template('stream.html', stream=s)
@@ -638,6 +687,11 @@ def grafico_evolucion_variables(medias, nombre_variable):
     width = 0.5
     plt.clf()
     barras = plt.bar(x, y, width, color='green')
+
+    # Se determina el eje de la y en función de los valores mínimos y máximos
+    plt.ylim(min(medias) - (min(medias) * 0.1),
+             max(medias) + (max(medias) * 0.1))
+
     # p1 = plt.bar(ind, menMeans, width, yerr=menStd)
 
     # barras.set(
@@ -832,8 +886,6 @@ def search():
     avicultores = models.Integrado.select(models.Integrado.nombre_integrado).execute()
 
     # print(request.form["num"])
-
-    # Se crean los gráficos
     # print("El numero de dias es: ", numero_dias_intervalo(query_params["desde"], query_params["hasta"]))
 
 
@@ -841,6 +893,7 @@ def search():
     #                                  query_params["hasta"])
 
 
+    # Se crean los gráficos
     for variable in variables_mostradas:
         if variable != "integrado":
             medias = calcular_medias_intervalo(
@@ -851,6 +904,7 @@ def search():
             )
             print("Las medias son: ", medias)
             grafico_evolucion_variables(medias, nombre_variable=variable)
+
 
     # Se le pone una ruta distinta cada vez para que no cargue la img como estática
     url_variable = time.strftime("%Y%m%d%H%M%S")
