@@ -22,6 +22,7 @@
         <link rel="stylesheet" href="/static/css/footer.css">
         <link rel="stylesheet" href="/static/css/load_data.css">
         <link rel="stylesheet" href="/static/css/table.css">
+        <link rel="stylesheet" href="/static/css/evolution.css">
 
         <!--Para las tablas-->
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
@@ -57,18 +58,22 @@
                                 <a class="nav-item nav-link" id="ref-index" href="{{ url_for('index') }}" >Inicio</a>
                                 {% if current_user.is_authenticated %}
                                     <a class="nav-item nav-link" id="ref-UploadData" href="{{ url_for('load_data') }}">Subir Datos</a>
-                                    <a class="nav-item nav-link" id="ref-admin" href="{{ url_for('admin.index') }}">Administrar Datos</a>
-                                    <a class="nav-item nav-link" id="ref-anlysis" href="{{ url_for('show_table') }}">Analisis</a>
+                                    <a class="nav-item nav-link" id="ref-evolution" href="{{ url_for('evolution') }}">Evolución</a>
+                                    <a class="nav-item nav-link" id="ref-anlysis" href="{{ url_for('show_table') }}">Análisis</a>
                                 {% endif %}
                                 <!--<a class="nav-item nav-link disabled" href="#">Disabled</a>-->
                             </div>
                         </div>
                         <div class="col-sm-4" id="nav-col3">
                             <div class="navbar-nav">
+                                <a class="nav-item nav-link" href="{{ url_for('register') }}">
+                                    {{ current_user.username }}
+                                </a>
                                 {% if current_user.is_authenticated %}
                                     <a class="nav-item nav-link" href="{{ url_for('logout') }}">
                                         <i class="fas fa-sign-out-alt" title='Log out'></i>
                                     </a>
+                                    <a class="nav-item nav-link" id="ref-admin" href="{{ url_for('admin.index') }}">Administrar Datos</a>
                                 {% else %}
                                     <a class="nav-item nav-link" href="{{ url_for('login') }}">
                                         <i class="fas fa-sign-in-alt" title='Log in'></i>
@@ -77,9 +82,6 @@
                                         <i class="fas fa-user-plus" title='Register'></i>
                                     </a>
                                 {% endif %}
-                                <a class="nav-item nav-link" href="{{ url_for('register') }}">
-                                    {{ current_user.username }}
-                                </a>
                             </div>
                         </div>
                     </div>

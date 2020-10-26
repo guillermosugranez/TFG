@@ -41,6 +41,7 @@ from sklearn import linear_model
 # App
 import models
 import forms  # LoginForm, RegisterForm
+import utilidad
 
 DEBUG = True  # Mayúsculas indica que es global (por convenio)
 PORT = 8000
@@ -51,12 +52,13 @@ MEDIA_FOLDER = os.getcwd() + '/media'
 ALLOWED_EXTENSIONS = {'xlsx'}
 
 CONFIGURACION = {
-    'provincias'        : ['huelva', 'sevilla', 'badajoz', 'cordoba'],
-    'tecnicos'          : ['carlos', 'sandra', 'eduardo'],
-    'fabricas'          : ['nuter', 'picasat'],
-    # 'nombre_integrado'  : ["AGROGANADERA MORANDOM", "JOSE MANUEL ROMERO MOLIN", "JUANA LOPEZ GUTIERREZ", "HNOS ALCAIDE, C.B.", "EDUARDO MARTÍN MARTÍN", "DEHESA LA ROTURA", "AGROGANADERA PINARES, SC", "HERMANOS CARRERO REYES, SC", "MIGUEL ANGEL GARRIDO TABODA", "DANIEL GALLARDO RODRIGUEZ", "AVES EL SAUCEJO, S.L.", "MANUEL PADILLA GARCÍA", "LUCAS REBOLLO ORTIZ", "JOSE ANTONIO BANDO MUÑOZ", "EXP.AGROPECUARIAS RIVERA DE HUELVA, S.L.", "CRISTOBAL MONCAYO HORMIGO", "DIEGO J. DOMINGUEZ ALBA", "JUAN LOPEZ GUTIERREZ", "ANTONIO CARDENAS BERLANGA", "JOSE DOMINGO SUAREZ LAVADO", "FRANCISCO JOSE CAMACHO SALAS", "VICTORINO RUBIO BRAVO", "BLAS ROMAN POVEA (INTEGRACION)", "BLAS ROMAN POVEA", "ALONSO ROBLES MORENO", "LOPEZ SOLTERO, SCA", "AGRICOLA HEREDIA MORENO, SC", "JUAN MANUEL CORONA RUEDA", "MJC. NARANJO RODIGUEZ,  SL", "LUIS ALFONSO VAZQUEZ", "MARIA DOLORES DOMINGUEZ GONZALEZ", "ROSARIO MINERO ", "CRISTAL RONCERO GONZÁLEZ", "AVEPRA, SL ", "AGROAVI PÉREZ VIDES", "MANUEL POVEA CARRASCO", "ENCARNACIÓN CLAVERO", "JUAN FERIA (FINCA VILLARAMOS)", "MARIA ISABEL MACIAS GARCIA", "MIGUEL ROSA BLANCO", "CONCEPCION MORATA ESTEPA", "CARMEN REAL ESTEBAN", "AVICOLA VALDELIMONES, S.L.", "FELIPE CALVENTE ROMERO", "MARIA VAZQUEZ RAMOS", "TEODORA DOMÍNGUEZ", "GONAN AVICULTURA, C.B.", "ISABEL CONTRERAS DOMINGUEZ", "JUAN SOSA CARMONA", "MANUEL CRUZ GARRIDO", "RICARDO SÁNCHEZ", "GONZALEZ MEJIAS E HIJOS, S.L.", "GENMA ORTIZ VAZQUEZ", "DEHESA SAN JUAN, SA", "RAUL ORTEGA JUAN", "MARIA JOSE RUIZ MOLINA", "GONAN AVICULTURA", "HNOS MATEOS, SCA", "ANTONIO VEGA PÉREZ", "BERNARDINO ROMERO, SL ", "LA PARRILLA 2000, SL"],
-    'variables'         : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria'],
-    'poblaciones'       : ["la nava", "cartaya", "los corrales", "aracena", "santa ana la real", "escacema del campo", "fuentes de león", "villanueva de san juan", "nerva", "martin de la jara", "la palma del condado", "aljaraque", "san juan del puerto", "almonte", "bollullos del condado", "fuente de leon", "el saucejo", "barbara de casas", "pedrera", "tocina", "san silvestre de guzman", "almonaster la real", "trigueros", "valverde del camino", "jerez de los caballeros", "santa eufemia", "campofrio", "carboneras", "lepe", "segura de leon", "bellavista", "la puebla de los infantes", "moguer", "el patras", "monesterio", "castillo de las guardas", "villamanrique de la condesa", "pilas", "valdezufre"]
+    'provincias'            : ['huelva', 'sevilla', 'badajoz', 'cordoba'],
+    'tecnicos'              : ['carlos', 'sandra', 'eduardo'],
+    'fabricas'              : ['nuter', 'picasat'],
+    # 'nombre_integrado'    : ["AGROGANADERA MORANDOM", "JOSE MANUEL ROMERO MOLIN", "JUANA LOPEZ GUTIERREZ", "HNOS ALCAIDE, C.B.", "EDUARDO MARTÍN MARTÍN", "DEHESA LA ROTURA", "AGROGANADERA PINARES, SC", "HERMANOS CARRERO REYES, SC", "MIGUEL ANGEL GARRIDO TABODA", "DANIEL GALLARDO RODRIGUEZ", "AVES EL SAUCEJO, S.L.", "MANUEL PADILLA GARCÍA", "LUCAS REBOLLO ORTIZ", "JOSE ANTONIO BANDO MUÑOZ", "EXP.AGROPECUARIAS RIVERA DE HUELVA, S.L.", "CRISTOBAL MONCAYO HORMIGO", "DIEGO J. DOMINGUEZ ALBA", "JUAN LOPEZ GUTIERREZ", "ANTONIO CARDENAS BERLANGA", "JOSE DOMINGO SUAREZ LAVADO", "FRANCISCO JOSE CAMACHO SALAS", "VICTORINO RUBIO BRAVO", "BLAS ROMAN POVEA (INTEGRACION)", "BLAS ROMAN POVEA", "ALONSO ROBLES MORENO", "LOPEZ SOLTERO, SCA", "AGRICOLA HEREDIA MORENO, SC", "JUAN MANUEL CORONA RUEDA", "MJC. NARANJO RODIGUEZ,  SL", "LUIS ALFONSO VAZQUEZ", "MARIA DOLORES DOMINGUEZ GONZALEZ", "ROSARIO MINERO ", "CRISTAL RONCERO GONZÁLEZ", "AVEPRA, SL ", "AGROAVI PÉREZ VIDES", "MANUEL POVEA CARRASCO", "ENCARNACIÓN CLAVERO", "JUAN FERIA (FINCA VILLARAMOS)", "MARIA ISABEL MACIAS GARCIA", "MIGUEL ROSA BLANCO", "CONCEPCION MORATA ESTEPA", "CARMEN REAL ESTEBAN", "AVICOLA VALDELIMONES, S.L.", "FELIPE CALVENTE ROMERO", "MARIA VAZQUEZ RAMOS", "TEODORA DOMÍNGUEZ", "GONAN AVICULTURA, C.B.", "ISABEL CONTRERAS DOMINGUEZ", "JUAN SOSA CARMONA", "MANUEL CRUZ GARRIDO", "RICARDO SÁNCHEZ", "GONZALEZ MEJIAS E HIJOS, S.L.", "GENMA ORTIZ VAZQUEZ", "DEHESA SAN JUAN, SA", "RAUL ORTEGA JUAN", "MARIA JOSE RUIZ MOLINA", "GONAN AVICULTURA", "HNOS MATEOS, SCA", "ANTONIO VEGA PÉREZ", "BERNARDINO ROMERO, SL ", "LA PARRILLA 2000, SL"],
+    'variables'             : ['integrado', 'pollos_entrados', 'pollos_salidos', 'porcentaje_bajas', 'kilos_carne', 'kilos_pienso', 'peso_medio', 'indice_transformacion', 'retribucion', 'medicamentos_por_pollo', 'dias_media_retirada', 'ganancia_media_diaria'],
+    'poblaciones'           : ["la nava", "cartaya", "los corrales", "aracena", "santa ana la real", "escacema del campo", "fuentes de león", "villanueva de san juan", "nerva", "martin de la jara", "la palma del condado", "aljaraque", "san juan del puerto", "almonte", "bollullos del condado", "fuente de leon", "el saucejo", "barbara de casas", "pedrera", "tocina", "san silvestre de guzman", "almonaster la real", "trigueros", "valverde del camino", "jerez de los caballeros", "santa eufemia", "campofrio", "carboneras", "lepe", "segura de leon", "bellavista", "la puebla de los infantes", "moguer", "el patras", "monesterio", "castillo de las guardas", "villamanrique de la condesa", "pilas", "valdezufre"],
+    'variables_evolucion'   : ["indice_transformacion", "peso_medio", "porcentaje_bajas", "retribucion", "ganancia_media_diaria"]
 }
 
 
@@ -240,7 +242,7 @@ def login():
             if check_password_hash(user.password, form.password.data):
                 login_user(user)  # Se loguea con la librería de flask
                 flash('Has iniciado sesión', 'success')
-                return redirect(url_for('index'))
+                return redirect(url_for('evolution'))
             else:
                 flash('Tu nombre de usuario o contraseña no existe', 'danger')
 
@@ -327,6 +329,7 @@ def dataset_to_bd(dataframe):
 
     for registro in d:
 
+
         registro_valido = True
 
         # Se validan los datos. Si falla salta el registro:
@@ -376,6 +379,8 @@ def dataset_to_bd(dataframe):
                 d[registro]['Avicultor'].strip().lower())
 
             # print(integrado)
+
+            # print("El tipo de dato de fecha es: ", type(d[registro]['FECHA']))
 
             # Se crea la camada
             models.Camada.create_camada(
@@ -452,7 +457,13 @@ def load_data():
                     # Ahora se carga en la bd
                     if dataset_to_bd(dataframe):
                         flash("Datos cargados con éxito", "success")
-                        return redirect(url_for('index'))  # Si todo...
+                        return render_template('evolution.html',
+                                               variables_evolucion=CONFIGURACION["variables_evolucion"],
+                                               url_variable=time.strftime(
+                                                   "%Y%m%d%H%M%S")
+                                               )
+
+                        return redirect(url_for('evolution'))  # Si todo...
                     else:
                         flash('No se pudieron procesar los datos', "danger")
                     # va bien vuelve al index
@@ -463,54 +474,9 @@ def load_data():
 
 
 
-
-def prediccion():
-    """
-    - Hay que hacer una consulta con todos los datos de toda la integracion
-    - se forma el dataset
-    - se cogen las medias de las 3 variables
-    -
-
-
-    """
-
-    # HACER LA TABLA
-
-    print("Prediccion:")
-
-    intervalo = 0
-    num_variables_ficticas = 5
-    nombre_variable = 'pollos_salidos'
-
-    m = [9, 8, 7, 7, 7, 5, 3, 5, 5, 6, 7, 4, 5, 7, 5, 4, 3, 5, 6, 7, 8, 5]
-    dataframe_medias = pd.DataFrame(m)
-
-    tabla = pd.DataFrame(m, columns=[nombre_variable])
-
-    # tabla = pd.DataFrame(medias, index=nombre_variable) # Lo convierto a DataSet
-    #
-    # print(tabla)
-    #
-    for i in range(num_variables_ficticas):
-        # indice = 'C' + str(i)
-        dataframe_medias = dataframe_medias.shift(periods=1)
-        tabla.insert(i+1,("t-" + str(i)), dataframe_medias)
-
-    print(tabla)
-    y = pd.DataFrame(m, columns=["y"])
-    y = y.shift(periods=-1)
-    # y.append(pd.DataFrame(np.nan))
-    print(y)
-
-    print("Fin Prediccion:")
-
-    pass
-
 @app.route('/')
 def index():
     """Vista principal. Muestra un timeline con los post de diferentes users"""
-
-    prediccion()
 
     # s = models.Post.select().limit(100)  # stream es el timeline
     # return render_template('stream.html', stream=s)
@@ -563,11 +529,13 @@ def stream(username=None):
 def search_function(query_params):
     """Devuelve un dataframe con la consulta realizada"""
 
-    # print("el avicultor es:", query_params["avicultor"])
+    print("desde: ", query_params["desde"])
+    print("hasta: ", query_params["hasta"])
 
     if query_params["avicultor"] == "Todos":
         query = models.Camada.select().where(
-            query_params["desde"] >= models.Camada.fecha < query_params["hasta"]
+                (models.Camada.fecha >= query_params["desde"]) &
+                (models.Camada.fecha < query_params["hasta"])
         )
     else:
         query = (models.Camada
@@ -575,8 +543,9 @@ def search_function(query_params):
             .join(models.Integrado)
             .group_by(models.Camada.codigo_camada)
             .where(
-                (query_params["desde"] >= models.Camada.fecha < query_params["hasta"]) &
-                (query_params["avicultor"] == models.Camada.integrado.nombre_integrado) &
+                (models.Camada.fecha >= query_params["desde"]) &
+                (models.Camada.fecha < query_params["hasta"]) &
+                (models.Camada.integrado.nombre_integrado == query_params["avicultor"]) &
                 (models.Camada.integrado == models.Integrado.nombre_integrado)
             )
         )
@@ -760,6 +729,170 @@ def grafico_evolucion_variables(medias, nombre_variable):
     # plt.show()
 
     pass
+
+
+def predecir(variables_a_predecir):
+    """ Predice la media del mes siguiente para un conjunto de variables """
+
+    # Esto es lo que hay que pasarle
+
+
+    medias = utilidad.calcular_medias_por_mes(variables_a_predecir)
+
+
+    # print(medias[2015]['indice_transformacion'])
+
+
+    # for anno in medias:
+    #     for variable in medias[anno]:
+    #         # print(medias[anno][variable])
+    #         for mes in medias[anno][variable]:
+    #             print(mes)
+
+    dict_variable_medias = {}
+
+    # Inicializo las listas para añadirles elementos
+    for variable in variables_a_predecir:
+        dict_variable_medias[variable] = []
+
+    # Se prepara el formato para el proceso
+    for anno in medias:
+        for variable in medias[anno]:
+            # print(medias[anno][variable])
+            for mes in medias[anno][variable]:
+                dict_variable_medias[variable].append(mes)
+
+    print(dict_variable_medias)
+
+    # Lista de parámetros:
+    intervalo = 0
+    num_variables_lag = 3
+
+    # m0 = [9, 8, 7, 7, 7, 5, 3, 5, 5, 6, 7, 4, 5, 7, 5, 4, 3, 5, 6, 7, 8, 5]
+    # m1 = [9, 8, 7, 2, 7, 3, 7, 5, 8, 6, 4, 2, 2, 1, 9, 4, 3, 1, 3, 2, 8, 1]
+
+    # # Esto es lo que hay que pasarle
+    # dict_variable_medias = {
+    #     'pollos_entrados': m0,
+    #     'pollos_salidos': m1,
+    # }
+
+    lista_valores_y = []
+    lista_valores_x = []
+
+    for variable in dict_variable_medias.keys():
+        print(variable)
+
+        dataframe_medias = pd.DataFrame(dict_variable_medias[variable])
+
+        # Se crea la primera columna de la tabla
+        tabla_de_variable = pd.DataFrame(
+            dict_variable_medias[variable],
+            columns=[variable]
+        )
+
+        # Se forman las variables con lag y con ellas se completa la tabla
+        for i in range(num_variables_lag):
+            # indice = 'C' + str(i)
+            dataframe_medias = dataframe_medias.shift(periods=1)
+            tabla_de_variable.insert(i + 1, (variable + "_t-" + str(i + 1)),
+                                     dataframe_medias)
+        #
+        # Se forma el conjunto de resultados (columna y)
+        y = pd.DataFrame(
+            dict_variable_medias[variable],
+            columns=["y"]
+        )
+        y = y.shift(periods=-1)  # Se desplaza una posición hacia arriba
+
+        # print("La tabla original\n", tabla, y)
+
+        # Se quitan las filas con valores NaN (Se capa por arriba).
+        conjunto_x = tabla_de_variable[num_variables_lag:]  # tanto en la tabla
+        conjunto_y = y[num_variables_lag:]  # como en la columna de resultados
+
+        # Se elimina el último resultado de 'y' (NaN)
+        conjunto_y = conjunto_y.iloc[:-1]
+
+        # Se añade este conjunto para posteriormente poder predecir la variable
+        lista_valores_x.append(conjunto_x)
+        lista_valores_y.append(conjunto_y)
+
+    # Se concatenan las tablas de los valores x
+    tabla_final = pd.concat(lista_valores_x, axis='columns')
+
+    # print("La tabla final al principio\n\n", tabla_final)
+
+    # Se saca la variable a predecir:
+    patron_a_predecir = tabla_final.tail(1)  # Se trata del último patron
+    # print("patron a predecir" + str(patron_a_predecir.shape) + ". \n", patron_a_predecir)
+
+    # Una vez sacado el patron a predecir, se elimina de la tabla
+    tabla_final = tabla_final.iloc[:-1]
+
+    print("La tabla final:\n\n", tabla_final)
+
+    # ==========================================================================
+
+    # Usar todos los datos disponibles para predecir
+    # Se aplica el modelo que se haya determinado
+    # Se hace para cada una de las variables
+
+    regr = linear_model.LinearRegression()
+    medias_predichas = []
+
+    for y_variable in lista_valores_y:
+        regr.fit(tabla_final, y_variable)
+        y_pred = regr.predict(patron_a_predecir)
+        medias_predichas.append(y_pred[0][0])
+
+    # print(medias_predichas)
+
+    # Se añaden a las medias
+    i = 0
+    for variable in dict_variable_medias:
+        dict_variable_medias[variable].append(medias_predichas[i])
+        i = i + 1
+        # print(dict_variable_medias[variable])
+        utilidad.graficos_evolucion(dict_variable_medias[variable], variable)
+
+
+
+
+@app.route('/evolution')
+def evolution():
+    """
+    - Hay que hacer una consulta con todos los datos de toda la integracion
+    - se forma el dataset
+    - se cogen las medias de las 3 variables
+    -
+
+
+    """
+
+    # Se envía una lista de las variables a predecir
+
+    variables_a_predecir = [
+        "indice_transformacion",
+        "retribucion",
+        "porcentaje_bajas",
+        "ganancia_media_diaria",
+        "peso_medio"
+    ]
+
+    # HACER LA TABLA
+    predecir(variables_a_predecir)
+
+    print("Fin Prediccion:")
+
+    print(CONFIGURACION["variables_evolucion"])
+
+    return render_template('evolution.html',
+                           variables_evolucion=CONFIGURACION[
+                               "variables_evolucion"],
+                           url_variable=time.strftime(
+                               "%Y%m%d%H%M%S")
+                           )
 
 
 @login_required

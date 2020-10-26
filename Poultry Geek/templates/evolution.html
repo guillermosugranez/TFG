@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+
+
+{% block content %}
+    <!--Se activa la sección "Evolution"-->
+    <script type="text/javascript">
+            document.getElementById('ref-evolution').classList.add("active");
+    </script>
+
+
+    <div id="evolution-container-main" class="container-fluid">
+
+        <div class="container-fluid" style="width:100%; height: auto">
+            <h1 id="evolution-h1" class="text-center text-dark">Evolución de la integración</h1>
+        </div>
+
+        <!-- Tarjetas de estadísticas -->
+        <div id="evolution-stats-cards" class="row container-fluid">
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Earnings (Monthly)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Earnings (Annual)</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="progress progress-sm mr-2">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Requests Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Requests</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-comments fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="container-fluid text-center" style="width: 100%">
+
+            {% for variable in variables_evolucion %}
+                <h3>{{variable}}</h3>
+                <div id="card-{{variable}}" class=" row container-fluid" style="width:100%; margin: 1% !important; padding-right: 30px">
+                    <div class="card-body shadow container-fluid text-center" style="width:100%; overflow:auto;; margin: 1%; margin:1%">
+
+                        <img src="{{ url_for('download_file', filename='evolution_' + variable + '.svg') }}?{{url_variable}}" alt="grafico de la evolucion de {{variable}}">
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+<!--        <div id="card-indice_transformacion" class=" row container-fluid">-->
+<!--            <div class="card-body shadow">-->
+<!--                <p>indice_transformacion</p>-->
+<!--                <img src="{{ url_for('download_file', filename='evolution_indice_transformacion.svg') }}?{{url_variable}}" alt="grafico de media">-->
+<!--            </div>-->
+<!--        </div>-->
+
+    </div>
+
+{% endblock %}
+
+{% block footer %}
+<!--footer-->
+<footer class="footer" id="footer">
+    <span class="text">Todos los derechos reservados</span>
+</footer>
+{% endblock %}

@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from flask_login import UserMixin
 from peewee import *
@@ -15,7 +15,7 @@ class User(UserMixin, Model):
     email = CharField(unique=True)
     password = CharField(max_length=120)
     # Asegurarse de que now es el atributo y no la función
-    joined_at = DateTimeField(default=datetime.datetime.now)
+    joined_at = DateTimeField(default=datetime.now)
 
     # La clase Meta sirve para tener en cuenta los metadatos del modelo
     # Cualquier modelo necesita la class Meta
@@ -104,7 +104,7 @@ class User(UserMixin, Model):
 #         related_name='posts',  # Nombre relacionado en la otra tabla
 #
 #     )
-#     timestamp = DateTimeField(default=datetime.datetime.now)
+#     timestamp = DateTimeField(default=datetime.now)
 #     content = TextField()
 #
 #     class Meta:
@@ -253,7 +253,7 @@ class Integrado(Model):
     ditancia = IntegerField(null=False)
     metros_cuadrados = IntegerField(null=False)
 
-    joined_at = DateTimeField(default=datetime.datetime.now)
+    joined_at = DateTimeField(default=datetime.now)
     # email = CharField(unique=True)
     # password = CharField(max_length=120)
 
@@ -264,6 +264,12 @@ class Integrado(Model):
         database = DATABASE  # Indica cuál es la bbdd del modelo
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at",)
+
+    # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
+    def get_posts(
+            self):  # Primero coge todos, luego filtra al objeto que llama
+        print("He llamado a get_post")
+        return Integrado.select().where(Post.user == self)
 
     @classmethod
     def create_integrado(cls, user, codigo, tecnico, fabrica, nombre_integrado,
@@ -325,7 +331,7 @@ class Camada(Model):
     peso_semana_5 = FloatField(default=0.0, null=True)
     peso_semana_6 = FloatField(default=0.0, null=True)
     peso_semana_7 = FloatField(default=0.0, null=True)
-    fecha = DateField(formats='%d/%m/%Y', null=True)
+    fecha = DateField(null=True)
     rendimiento = FloatField(default=0.0, null=True)
     FP = FloatField(default=0.0, null=True)
     bajas_matadero = IntegerField(default=0, null=True)
