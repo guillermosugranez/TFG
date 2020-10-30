@@ -28,14 +28,31 @@ bp = Blueprint(
 # ==============================================================================
 
 
+def min_max_year():
+
+    # Se determina el año más alto y más bajo de los que se tengan camadas
+    cnx = sqlite3.connect('social.db')
+    menor_fecha = cnx.execute("SELECT MIN(fecha) FROM camada").fetchone()[0]
+    mayor_fecha = cnx.execute("SELECT MAX(fecha) FROM camada").fetchone()[0]
+
+    print("La fecha menor es: ", menor_fecha)
+    print("La fecha mayor es: ", mayor_fecha)
+
+    menor_anno = datetime.strptime(menor_fecha, "%Y-%m-%d").year
+    mayor_anno = datetime.strptime(mayor_fecha, "%Y-%m-%d").year
+
+    return menor_anno, mayor_anno
+
+
 def graficos_evolucion(medias_variable, variable):
+
 
     plt.clf() # Se borra la imagen que huibiera anteriormente
 
     x = np.arange(0, len(medias_variable), 1)
     y = []
 
-    print(medias_variable)
+    # print(medias_variable)
 
     for media in medias_variable:
         y.append(media)
@@ -44,17 +61,9 @@ def graficos_evolucion(medias_variable, variable):
 
     plt.grid(alpha=0.5)
 
-    # Gráfico de la predicción
-    plt.plot(x, y, color="aqua")
+    # Valores de x
 
-    # Gráfico de lo que llevamos hasta ahora (se le quita la media predicha)
-    y.pop()
-    x = np.arange(0, len(medias_variable)-1, 1)
-    plt.plot(x, y, color="green")
-
-    # Valores de x (meses)
-
-    meses = (
+    meses = [
         'ene',
         'feb',
         'mar',
@@ -67,7 +76,37 @@ def graficos_evolucion(medias_variable, variable):
         'oct',
         'nov',
         'dic'
-    )
+    ]
+
+    menor_anno, mayor_anno = min_max_year()
+
+    lista_meses = []
+    i = 0
+
+    for mes in medias_variable:
+        if i == 0:
+            lista_meses.append(meses[i] + " " + str(menor_anno))
+            menor_anno = menor_anno + 1
+        else:
+            lista_meses.append(meses[i])
+
+        i = i + 1
+        if i == 12:
+            i = 0
+
+    plt.xticks(ticks=x, labels=lista_meses, rotation=-45, horizontalalignment='left')
+
+    # Gráfico de la predicción
+    plt.plot(x, y, color="aqua")
+
+    # Gráfico de lo que llevamos hasta ahora (se le quita la media predicha)
+    y.pop()
+    x = np.arange(0, len(medias_variable)-1, 1)
+    plt.plot(x, y, color="green")
+
+    # Valores de x (meses)
+
+
 
     # plt.xlabel()
 
@@ -88,12 +127,7 @@ def calcular_medias_por_mes(lista_variables):
     teniendo en cuenta las variables pasadas como parámetro """
 
     # Se determina el año más alto y más bajo de los que se tengan camadas
-    cnx = sqlite3.connect('social.db')
-    menor_fecha = cnx.execute("SELECT MIN(fecha) FROM camada").fetchone()[0]
-    mayor_fecha = cnx.execute("SELECT MAX(fecha) FROM camada").fetchone()[0]
-
-    menor_anno = datetime.strptime(menor_fecha, "%Y-%m-%d").year
-    mayor_anno = datetime.strptime(mayor_fecha, "%Y-%m-%d").year
+    menor_anno, mayor_anno = min_max_year()
 
     # print(menor_anno)
     # print(mayor_anno)
@@ -147,8 +181,10 @@ def modelo_autoregresivo(dict_variable_medias, num_variables_lag=3):
     - El patrón a predecir
     """
 
-    lista_valores_y = []
-    lista_valores_x = []
+    lista_valores_x = [] # Con ellos se forma la tabla final (concat)
+
+    # Para cada variable se guarda su conjunto 'y' particular
+    valores_y_de_cada_variable = {}
 
     for variable in dict_variable_medias.keys():
         # print(variable)
@@ -189,7 +225,8 @@ def modelo_autoregresivo(dict_variable_medias, num_variables_lag=3):
 
         # Se añade este conjunto para posteriormente poder predecir la variable
         lista_valores_x.append(conjunto_x)  # A concat se le pasa una fila
-        lista_valores_y.append(conjunto_y)
+        # Se añade al diccionario la columna y correspondiente
+        valores_y_de_cada_variable[variable] = conjunto_y
 
     # Se concatenan las tablas de los valores x
     tabla_final = pd.concat(lista_valores_x, axis='columns')
@@ -205,40 +242,51 @@ def modelo_autoregresivo(dict_variable_medias, num_variables_lag=3):
 
     # print("La tabla final:\n\n", tabla_final)
 
-    return lista_valores_y, tabla_final, patron_a_predecir
+    return valores_y_de_cada_variable, tabla_final, patron_a_predecir
 
 
-def predecir(variables_a_predecir):
-    """ Predice la media del mes siguiente para un conjunto de variables """
+def predecir(variables_a_predecir, medias):
+    """
+    Predice la media del mes siguiente para un conjunto de variables
+
+    * Recibe:
+        - Diccionario con las medias por meses de cada variable
+
+    * Devuelve:
+        - Mismo diccionario con la media del mes siguiente predicha
+
+    """
 
     dict_variable_medias = {}
-
-    medias = calcular_medias_por_mes(variables_a_predecir)
 
     # Inicializo las listas para añadirles elementos
     for variable in variables_a_predecir:
         dict_variable_medias[variable] = []
 
     # Se prepara el formato para el proceso
+    # Se comprubea que no haya meses sin datos
     for anno in medias:
         for variable in medias[anno]:
             # print(medias[anno][variable])
-            for mes in medias[anno][variable]:
-                dict_variable_medias[variable].append(mes)
+            for mes in range(1, 13, 1):
+                try:
+                    dict_variable_medias[variable].append(medias[anno][variable][mes])
+                except:
+                    # Tiene que mostrar un error si no hay datos entre los meses
+                    # print("te muestro un error")
+                    # No pintar las gráficas
+                    pass
+                else:
+                    # print("Dato bien registrado")
+                    pass
+            print("")
 
-    # print(dict_variable_medias)
-
-    # m0 = [9, 8, 7, 7, 7, 5, 3, 5, 5, 6, 7, 4, 5, 7, 5, 4, 3, 5, 6, 7, 8, 5]
-    # m1 = [9, 8, 7, 2, 7, 3, 7, 5, 8, 6, 4, 2, 2, 1, 9, 4, 3, 1, 3, 2, 8, 1]
-
-    # # Esto es lo que hay que pasarle
-    # dict_variable_medias = {
-    #     'pollos_entrados': m0,
-    #     'pollos_salidos': m1,
-    # }
+            # for mes in medias[anno][variable]:
+            #     print("mes: ", mes)
+            #
 
     # Se obtiene el modelo autoregresivo con las medias calculadas
-    lista_valores_y, tabla_final, patron_a_predecir = (
+    valores_y_de_cada_variable, tabla_final, patron_a_predecir = (
         modelo_autoregresivo(
             dict_variable_medias,
             num_variables_lag=3
@@ -249,24 +297,15 @@ def predecir(variables_a_predecir):
 
     # Se aplica el modelo que se haya determinado
     regr = linear_model.LinearRegression()
-    medias_predichas = [] # Aqui se van guardando las medias predichas
 
-    # Se hace para cada una de las variables
-    for y_variable in lista_valores_y:
-        # Se usan todos los datos disponibles para predecir
-        regr.fit(tabla_final, y_variable)
-        y_pred = regr.predict(patron_a_predecir)
-        medias_predichas.append(y_pred[0][0])
-
-    # print(medias_predichas)
-
-    # Se añaden a las medias y se genera el gráfico correspondiente
-    i = 0
+    # Se predice el siguiente mes para cada variable
     for variable in dict_variable_medias:
-        dict_variable_medias[variable].append(medias_predichas[i])
-        i = i + 1
+        regr.fit(tabla_final, valores_y_de_cada_variable[variable])
+        media_predicha = regr.predict(patron_a_predecir)
+        dict_variable_medias[variable].append(media_predicha[0][0])
         # print(dict_variable_medias[variable])
-        graficos_evolucion(dict_variable_medias[variable], variable)
+
+    return dict_variable_medias
 
 
 @login_required
@@ -279,8 +318,27 @@ def evolution():
     - Genera los gráficos correspondientes y los presenta en la web
     """
 
+    medias = calcular_medias_por_mes(CONFIGURACION["variables_evolucion"])
+
+    try:
+        print(medias['2016']["peso_medio"][3])
+    except:
+        pass
+
+
+    # for anno in medias:
+    #     print(anno)
+    #     for variable in medias[anno]:
+    #         print(variable)
+    #         for media in medias[anno][variable]:
+    #             print(media)
+
+
     # Se aplicará la predicción a las variables definidas en la configuración
-    predecir(CONFIGURACION["variables_evolucion"])
+    dict_variable_medias = predecir(CONFIGURACION["variables_evolucion"], medias)
+
+    for variable in dict_variable_medias:
+        graficos_evolucion(dict_variable_medias[variable], variable)
 
     return render_template('evolution.html',
                            variables_evolucion=(
@@ -307,3 +365,7 @@ def evolution():
     # grid search (ajuste de hiperparámetro)
 
     # Preguntar a Pedro por el tipo de modelo
+
+    # Manejar el problema de los meses
+
+    # Problema si el año empieza en otro mes que no es enero (graficos)

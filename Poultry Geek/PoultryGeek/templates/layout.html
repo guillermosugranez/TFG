@@ -105,14 +105,18 @@
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %} <!-- Solo si hay mensajes que desplegar -->
                     <!-- Obtenemos la categoría y el mensaje en los mensajes-->
-                    {% for category, message in messages %}
-                        <!-- category es una varible de python
-                         - Esta parte del código hace que la clase de este div cambie en función de la categoria del mensaje
-                        -->
-                        <div class="container text-center" style="opacity: 0.9;position: absolute; margin-top: 1%">
-                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    <div class="container text-center align-items-center" style="position: absolute; margin-top: 1%; flex-direction: column; width: 100%">
+                        {% for category, message in messages %}
+                            <!-- category es una varible de python
+                             - Esta parte del código hace que la clase de este div cambie en función de la categoria del mensaje
+                            -->
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" style="width: 100%; opacity: 0.9; z-index: 1" role="alert">
                                 {% if category == 'success' %}
-                                    <strong>Correcto!</strong> {{ message }}
+                                    <strong>Éxito!</strong> {{ message }}
+                                {% elif category == 'warning' %}
+                                    <strong>Avíso!</strong> {{ message }}
+                                {% elif category == 'info' %}
+                                    <strong>Info!</strong> {{ message }}
                                 {% else %}
                                     <strong>Error!</strong> {{ message }}
                                 {% endif %}
@@ -120,8 +124,8 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% endif %}
             {% endwith %}
 

@@ -7,7 +7,7 @@ from wtforms.validators import (  # Validadores para los formularios
     DataRequired, ValidationError, Email, Regexp, Length, EqualTo
 )
 
-import models
+from PoultryGeek import models
 
 def name_exists(form, field):
     """Controla que el usuario no esté ya creado"""

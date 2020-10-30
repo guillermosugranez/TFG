@@ -8,9 +8,9 @@
             document.getElementById('ref-UploadData').classList.add("active");
     </script>
 
-<div id="load_data" class="container-fluid">
+<div id="load_data" class="container-fluid" style="position: relative">
     <div class="container" id="load_data-box-start">
-        <h2 class="text-center text-dark">Poultry Geek</h2>
+<!--        <h2 class="text-center text-dark">Poultry Geek</h2>-->
     </div>
     <div class="container border border-dark rounded" id="load_data-box">
         <form id="load_data-form" class="form container-fluid" enctype=multipart/form-data action="" method="post">
@@ -20,17 +20,57 @@
                 <div class="input-group">
                     <div class="custom-file">
                         <input type="file" name="file" class="custom-file-input" id="customFile">
-                        <label class="custom-file-label" for="customFile">Choose file</label>
+                        <label class="custom-file-label lang="es"" for="customFile">Seleccione el archivo</label>
                     </div>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group d-flex justify-content-end">
                 <input type="submit" name="submit" class="btn btn-dark text-white btn-md" value="Subir Datos">
             </div>
+
+            <div class="form-group" style="margin-top: 10%">
+
+                {% if resultado_subida.n_nombre_fabrica > 0 %}
+                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
+                        <li class="list-group-item bg-dark text-white text-center"><strong>Fábricas no registradas</strong></li>
+                        {% for nuevo_nombre_fabrica in resultado_subida.nombre_fabrica %}
+                            <li class="list-group-item">{{ nuevo_nombre_fabrica }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if resultado_subida.n_nombre_provincia > 0 %}
+                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
+                        <li class="list-group-item bg-dark text-white text-center"><<strong>Provincias no registradas</strong></li>
+                        {% for nuevo_nombre_provincia in resultado_subida.nombre_provincia %}
+                            <li class="list-group-item">{{ nuevo_nombre_provincia }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if resultado_subida.n_nombre_tecnico > 0 %}
+                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
+                        <li class="list-group-item bg-dark text-white text-center"><strong>Técnicos no registradas</strong></li>
+                        {% for nuevo_nombre_tecnico in resultado_subida.nombre_tecnico %}
+                            <li class="list-group-item">{{ nuevo_nombre_tecnico }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if resultado_subida.n_nombre_poblacion > 0 %}
+                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
+                        <li class="list-group-item bg-dark text-white text-center"><strong>Poblaciones no registradas</strong></li>
+                        {% for nuevo_nombre_poblacion in resultado_subida.nombre_poblacion %}
+                            <li class="list-group-item">{{ nuevo_nombre_poblacion }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+            </div>
+
         </form>
     </div>
     <div class="container" id="load_data-box-end">
-
     </div>
 </div>
 

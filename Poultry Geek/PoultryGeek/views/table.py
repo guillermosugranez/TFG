@@ -316,10 +316,10 @@ def search():
                 )
             else:
                 lista_por_variable.append(
-                    format((f'{table[variable].mean():,.4f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    format((f'{table[variable].mean():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
                 )
                 lista_por_variable.append(
-                    format((f'{table[variable].std():,.4f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    format((f'{table[variable].std():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
                 )
 
 

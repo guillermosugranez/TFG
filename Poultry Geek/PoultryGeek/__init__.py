@@ -75,7 +75,7 @@ app.config['FLASK_ADMIN_SWATCH'] = 'slate'  # Tema para la administracion
 admin = Admin(app, name='Poultry Geek', template_mode='bootstrap3')
 
 def admin_loader():
-    # admin.add_view(ModelView(models.User)) # Reservado para superuser
+    admin.add_view(ModelView(models.User)) # Reservado para superuser
     admin.add_view(ModelView(models.Integrado))
     admin.add_view(ModelView(models.Camada))
     admin.add_view(ModelView(models.Tecnico))
@@ -189,6 +189,11 @@ if __name__ == "__main__":
         except ValueError:  # Si el tecnico ya está en la bbdd
             pass
 
+    # try:
+    #     models.Tecnico.create_tecnico(num_tecnico=1, nombre_tecnico='Javier')
+    # except ValueError:  # Si el tecnico ya está en la bbdd
+    #     pass
+
     # Inicializar fabrica
     for fabrica in CONFIGURACION['fabricas']:
         try:
@@ -198,7 +203,7 @@ if __name__ == "__main__":
         except ValueError:  # Si el fabrica ya está en la bbdd
             pass
 
-    # Inicializar fabrica
+    # Inicializar poblacion
     for poblacion in CONFIGURACION['poblaciones']:
         try:
             models.Poblacion.create_poblacion(

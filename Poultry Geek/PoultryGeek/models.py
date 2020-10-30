@@ -26,52 +26,52 @@ class User(UserMixin, Model):
         order_by = ("-joined_at",)
 
     # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
-    def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
-        print("He llamado a get_post")
-        return Post.select().where(Post.user == self)
-
-    def get_stream(self):
-        """Mostrar los post míos y de la gente que sigo"""
-
-        # Devuelve todos los post
-        return Post.select().where(  # de...
-            # Un usuario que se encuentra en la lista de los que sigue
-            (Post.user << self.following()) |
-            (Post.user == self)  # ó del mismo usuario
-        )
-
-
-    def get_integrado(self):
-        """Mostrar los post míos y de la gente que sigo"""
-
-        # Devuelve todos los post
-        return Integrado.select().where(  # de...
-            # Un usuario que se encuentra en la lista de los que sigue
-            (Integrado.user == self)  # ó del mismo usuario
-        )
-
-
-    def following(self):
-        """Los usuarios que sigue el usuario actual"""
-
-        return (
-            User.select().join(  # Se usa el join porque se usan varias tablas
-                Relationship, on=Relationship.to_user  # Todos los usuarios
-            ).where(
-                Relationship.from_user == self  # A los que sigue el actual user
-            )
-        )
-
-    def followers(self):
-        """Los usuarios que nos siguen"""
-
-        return (
-            User.select().join(  # Se usa el join porque se usan varias tablas
-                Relationship, on=Relationship.from_user  # Todos los usuarios
-            ).where(
-                Relationship.to_user == self  # A los que sigue el actual user
-            )
-        )
+    # def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
+    #     print("He llamado a get_post")
+    #     return Post.select().where(Post.user == self)
+    #
+    # def get_stream(self):
+    #     """Mostrar los post míos y de la gente que sigo"""
+    #
+    #     # Devuelve todos los post
+    #     return Post.select().where(  # de...
+    #         # Un usuario que se encuentra en la lista de los que sigue
+    #         (Post.user << self.following()) |
+    #         (Post.user == self)  # ó del mismo usuario
+    #     )
+    #
+    #
+    # def get_integrado(self):
+    #     """Mostrar los post míos y de la gente que sigo"""
+    #
+    #     # Devuelve todos los post
+    #     return Integrado.select().where(  # de...
+    #         # Un usuario que se encuentra en la lista de los que sigue
+    #         (Integrado.user == self)  # ó del mismo usuario
+    #     )
+    #
+    #
+    # def following(self):
+    #     """Los usuarios que sigue el usuario actual"""
+    #
+    #     return (
+    #         User.select().join(  # Se usa el join porque se usan varias tablas
+    #             Relationship, on=Relationship.to_user  # Todos los usuarios
+    #         ).where(
+    #             Relationship.from_user == self  # A los que sigue el actual user
+    #         )
+    #     )
+    #
+    # def followers(self):
+    #     """Los usuarios que nos siguen"""
+    #
+    #     return (
+    #         User.select().join(  # Se usa el join porque se usan varias tablas
+    #             Relationship, on=Relationship.from_user  # Todos los usuarios
+    #         ).where(
+    #             Relationship.to_user == self  # A los que sigue el actual user
+    #         )
+    #     )
 
     # Constructor
     # cls hace que el método sea de la misma clase, y no de la instancia
@@ -133,7 +133,8 @@ class User(UserMixin, Model):
 class Tecnico(Model):
     """"""
 
-    nombre_tecnico = CharField(unique=True, null=False, primary_key=True)
+    id_tecnico = AutoField()
+    nombre_tecnico = CharField(unique=True, null=False)
 
     class Meta:
         database = DATABASE
@@ -154,7 +155,8 @@ class Tecnico(Model):
 class Provincia(Model):
     """"""
 
-    nombre_provincia = CharField(unique=True, null=False, primary_key=True)
+    id_provincia = AutoField()
+    nombre_provincia = CharField(unique=True, null=False)
 
     class Meta:
         database = DATABASE
@@ -172,10 +174,12 @@ class Provincia(Model):
             raise ValueError("Provincia Already exists")
 
 
+
 class Fabrica(Model):
     """"""
 
-    nombre_fabrica = CharField(unique=True, null=False, primary_key=True)
+    id_fabrica = AutoField()
+    nombre_fabrica = CharField(unique=True, null=False)
 
     class Meta:
         database = DATABASE
@@ -196,7 +200,8 @@ class Fabrica(Model):
 class Poblacion(Model):
     """"""
 
-    nombre_poblacion = CharField(unique=True, null=False, primary_key=True)
+    id_poblacion = AutoField()
+    nombre_poblacion = CharField(unique=True, null=False)
 
     class Meta:
         database = DATABASE
@@ -218,6 +223,8 @@ class Poblacion(Model):
 class Integrado(Model):
     """Representa un granjero asociado a la integración"""
 
+    id_integrado = AutoField()
+
     user = ForeignKeyField(  # Los integrados los gestiona un usuario
         User,
         related_name='integrados',  # Nombre relacionado en la otra tabla
@@ -225,7 +232,7 @@ class Integrado(Model):
     )
 
     codigo = CharField(null=False)
-    nombre_integrado = CharField(unique=True, null=False, primary_key=True)
+    nombre_integrado = CharField(unique=True, null=False)
 
     fabrica = ForeignKeyField(  # Los integrados los gestiona un usuario
         Fabrica,
@@ -265,11 +272,11 @@ class Integrado(Model):
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at",)
 
-    # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
-    def get_posts(
-            self):  # Primero coge todos, luego filtra al objeto que llama
-        print("He llamado a get_post")
-        return Integrado.select().where(Post.user == self)
+    # # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
+    # def get_posts(
+    #         self):  # Primero coge todos, luego filtra al objeto que llama
+    #     print("He llamado a get_post")
+    #     return Integrado.select().where(Post.user == self)
 
     @classmethod
     def create_integrado(cls, user, codigo, tecnico, fabrica, nombre_integrado,
@@ -289,40 +296,46 @@ class Integrado(Model):
                     ditancia=ditancia,
                     metros_cuadrados=metros_cuadrados,
                 )
+                return True
         except IntegrityError:
             # raise ValueError("Integrado Already exists")
-            pass
+            return False
 
 
 class Camada(Model):
     """Representa una camada de un granjero asociado"""
 
+    id_camada = AutoField()
+
     integrado = ForeignKeyField(  # Hace referencia a un usuario
         Integrado,  # La clave foranea apunta hacia un integrado
         related_name='camadas',  # Nombre relacionado en la otra tabla
     )
+    codigo_camada = CharField(unique=True, null=False)
+    fecha = DateField(null=False, formats="%Y-%m-%d")
 
-    codigo_camada = CharField(unique=True, null=False, primary_key=True)
+    # Críticas
+    pollos_entrados = FloatField(null=False)
+    pollos_salidos = FloatField(null=False)
+    porcentaje_bajas = FloatField(null=False)
+    kilos_carne = FloatField(null=False)
+    kilos_pienso = FloatField(null=False)
+    peso_medio = FloatField(null=False)
+    indice_transformacion = FloatField(null=False)
+    retribucion = FloatField(null=False)
+    medicamentos_por_pollo = FloatField(null=False)
+    dias_media_retirada = FloatField(null=False)
+    ganancia_media_diaria = FloatField(null=False)
 
+    # Menos importantes
+    bajas_primera_semana = FloatField(default=0, null=True)
     medicamentos = FloatField(default=0.0, null=True)
     liquidacion = FloatField(default=0.0, null=True)
-    pollos_entrados = IntegerField(default=0, null=True)
-    pollos_salidos = IntegerField(default=0, null=True)
-    porcentaje_bajas = FloatField(default=0.0, null=True)
-    bajas_primera_semana = IntegerField(default=0, null=True)
     porcentaje_bajas_primera_semana = FloatField(default=0.0, null=True)
-    kilos_carne = IntegerField(default=0, null=True)
-    kilos_pienso = IntegerField(default=0, null=True)
-    peso_medio = FloatField(default=0.0, null=True)
-    indice_transformacion = FloatField(default=0.0, null=True)
-    retribucion = FloatField(default=0.0, null=True)
-    medicamentos_por_pollo = FloatField(default=0.0, null=True)
     rendimiento_metro_cuadrado = FloatField(default=0.0, null=True)
     pollo_metro_cuadrado = FloatField(default=0.0, null=True)
     kilos_consumidos_por_pollo_salido = FloatField(default=0.0, null=True)
-    dias_media_retirada = FloatField(default=0.0, null=True)
-    ganancia_media_diaria = FloatField(default=0.0, null=True)
-    dias_primer_camion = IntegerField(default=0, null=True)
+    dias_primer_camion = FloatField(default=0, null=True)
     peso_primer_dia = FloatField(default=0.0, null=True)
     peso_semana_1 = FloatField(default=0.0, null=True)
     peso_semana_2 = FloatField(default=0.0, null=True)
@@ -331,11 +344,10 @@ class Camada(Model):
     peso_semana_5 = FloatField(default=0.0, null=True)
     peso_semana_6 = FloatField(default=0.0, null=True)
     peso_semana_7 = FloatField(default=0.0, null=True)
-    fecha = DateField(null=True)
     rendimiento = FloatField(default=0.0, null=True)
     FP = FloatField(default=0.0, null=True)
-    bajas_matadero = IntegerField(default=0, null=True)
-    decomisos_matadero = IntegerField(default=0, null=True)
+    bajas_matadero = FloatField(default=0, null=True)
+    decomisos_matadero = FloatField(default=0, null=True)
     porcentaje_bajas_matadero = FloatField(default=0.0, null=True)
     porcentaje_decomisos = FloatField(default=0.0, null=True)
 
@@ -344,6 +356,10 @@ class Camada(Model):
     # Añade información extra, al margen de los atributos, métodos... etc.
     class Meta:
         database = DATABASE  # Indica cuál es la bbdd del modelo
+        constraints = [
+            Check('pollos_entrados > 0'),
+
+        ]
         # Indica cómo serán ordenados los registros cuando sean creados
         # order_by = ("-joined_at",)
 
@@ -404,9 +420,10 @@ class Camada(Model):
                     porcentaje_bajas_matadero=porcentaje_bajas_matadero,
                     porcentaje_decomisos=porcentaje_decomisos,
                 )
+                return True
         except IntegrityError:
             # raise ValueError("Camada Already exists")
-            pass
+            return False
 
 
 def initialize():
