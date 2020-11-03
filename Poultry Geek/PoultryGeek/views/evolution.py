@@ -3,7 +3,7 @@ from flask import Blueprint
 import sqlite3
 import os
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import (render_template)
 from flask_login import (login_required)
@@ -35,11 +35,12 @@ def min_max_year():
     menor_fecha = cnx.execute("SELECT MIN(fecha) FROM camada").fetchone()[0]
     mayor_fecha = cnx.execute("SELECT MAX(fecha) FROM camada").fetchone()[0]
 
-    print("La fecha menor es: ", menor_fecha)
-    print("La fecha mayor es: ", mayor_fecha)
+    # print("La fecha menor es: ", menor_fecha)
+    # print("La fecha mayor es: ", mayor_fecha)
 
     menor_anno = datetime.strptime(menor_fecha, "%Y-%m-%d").year
     mayor_anno = datetime.strptime(mayor_fecha, "%Y-%m-%d").year
+
 
     return menor_anno, mayor_anno
 
@@ -102,7 +103,7 @@ def graficos_evolucion(medias_variable, variable):
     # Gráfico de lo que llevamos hasta ahora (se le quita la media predicha)
     y.pop()
     x = np.arange(0, len(medias_variable)-1, 1)
-    plt.plot(x, y, color="green")
+    plt.plot(x, y, color=CONFIGURACION['variables_evolucion_tema'][variable])
 
     # Valores de x (meses)
 
@@ -308,6 +309,90 @@ def predecir(variables_a_predecir, medias):
     return dict_variable_medias
 
 
+def info_tarjetas():
+        """ Recolecta la información para mostrar en las tarjetas superiores"""
+
+        informacion_tarjetas = {}
+
+        # lista_campos = ['icono', 'tema']
+        #
+        #
+        # for variable in CONFIGURACION['variables_evolucion']:
+        #     for campo in lista_campos:
+
+        # Ultima fecha
+        try:
+            ultima_fecha = models.Camada.get_fecha_ultima_camada()
+            fecha_anterior = ultima_fecha - timedelta(days=365)
+        except:
+            return {}
+
+        # print("tipo es: ", type(ultima_fecha))
+
+        medias = {}
+
+        for variable in CONFIGURACION['variables_evolucion']:
+
+            medias[variable] = {}
+            ultima = round(models.Camada.get_media(fecha=ultima_fecha, variable=variable), 3)
+            anterior = round(models.Camada.get_media(fecha=fecha_anterior, variable=variable), 3)
+            informacion_tarjetas[variable] = {'media_ultima': ultima, 'media_anterior': anterior}
+
+        informacion_tarjetas['indice_transformacion']['icono'] = 'exchange-alt'
+        informacion_tarjetas['peso_medio']['icono'] = 'balance-scale-right'
+        informacion_tarjetas['porcentaje_bajas']['icono'] = 'percentage'
+        informacion_tarjetas['retribucion']['icono'] = 'euro-sign'
+        informacion_tarjetas['ganancia_media_diaria']['icono'] = 'coins'
+
+        #=========                                                    =========#
+
+        if (informacion_tarjetas['indice_transformacion']['media_ultima'] <
+                informacion_tarjetas['indice_transformacion']['media_anterior']):
+            informacion_tarjetas['indice_transformacion']['color'] = 'green'
+        else:
+            informacion_tarjetas['indice_transformacion']['color'] = 'red'
+
+
+        if (informacion_tarjetas['peso_medio']['media_ultima'] >
+                informacion_tarjetas['peso_medio']['media_anterior']):
+            informacion_tarjetas['peso_medio']['color'] = 'green'
+        else:
+            informacion_tarjetas['peso_medio']['color'] = 'red'
+
+
+        if (informacion_tarjetas['porcentaje_bajas']['media_ultima'] <
+                informacion_tarjetas['porcentaje_bajas']['media_anterior']):
+            informacion_tarjetas['porcentaje_bajas']['color'] = 'green'
+        else:
+            informacion_tarjetas['porcentaje_bajas']['color'] = 'red'
+
+
+        if (informacion_tarjetas['retribucion']['media_ultima'] >
+                informacion_tarjetas['retribucion']['media_anterior']):
+            informacion_tarjetas['retribucion']['color'] = 'green'
+        else:
+            informacion_tarjetas['retribucion']['color'] = 'red'
+
+
+        if (informacion_tarjetas['ganancia_media_diaria']['media_ultima'] <
+                informacion_tarjetas['ganancia_media_diaria']['media_anterior']):
+            informacion_tarjetas['ganancia_media_diaria']['color'] = 'green'
+        else:
+            informacion_tarjetas['ganancia_media_diaria']['color'] = 'red'
+
+        # =========                                                    =========#
+
+        informacion_tarjetas['ultima_fecha'] = datetime.strftime(
+            ultima_fecha, "%d-%m-%Y")
+
+        informacion_tarjetas['fecha_anterior'] = datetime.strftime(
+            fecha_anterior,"%d-%m-%Y")
+
+        print(informacion_tarjetas)
+
+        return informacion_tarjetas
+
+
 @login_required
 @bp.route('/evolution')
 def evolution():
@@ -318,12 +403,18 @@ def evolution():
     - Genera los gráficos correspondientes y los presenta en la web
     """
 
-    medias = calcular_medias_por_mes(CONFIGURACION["variables_evolucion"])
-
     try:
-        print(medias['2016']["peso_medio"][3])
+        medias = calcular_medias_por_mes(CONFIGURACION["variables_evolucion"])
     except:
-        pass
+        return render_template('evolution.html',
+                               hay_datos=False,
+                               informacion_tarjetas=info_tarjetas(),
+                               tema=CONFIGURACION['variables_evolucion_tema'],
+                               variables_evolucion=(
+                                   CONFIGURACION["variables_evolucion"]),
+                               url_variable=(
+                                   time.strftime("%Y%m%d%H%M%S"))
+                               )
 
 
     # for anno in medias:
@@ -340,7 +431,11 @@ def evolution():
     for variable in dict_variable_medias:
         graficos_evolucion(dict_variable_medias[variable], variable)
 
+
     return render_template('evolution.html',
+                           hay_datos=True,
+                           informacion_tarjetas=info_tarjetas(),
+                           tema=CONFIGURACION['variables_evolucion_tema'],
                            variables_evolucion=(
                                CONFIGURACION["variables_evolucion"]),
                            url_variable=(

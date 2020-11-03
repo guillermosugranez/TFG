@@ -1,3 +1,7 @@
+.custom-file-input~.custom-file-label::after {
+    content: attr(data-label);
+}
+
 #load_data {
     height: 100%;
     width: 40%;

@@ -19,6 +19,7 @@ import numpy as np
 from PoultryGeek import models
 from PoultryGeek import forms
 from PoultryGeek import CONFIGURACION
+from PoultryGeek import FORMAT
 
 bp = Blueprint("table", __name__, template_folder='templates', static_folder='static')
 
@@ -59,7 +60,7 @@ def calcular_medias_intervalo(datos, desde, hasta, variable):
     elif (numero_dias < 11): # No hará nada si el periodo es demasiado pequeño
         return None
     else: # para cualquier otro periodo de tiempo se divide en 10
-        num_periodos = 11
+        num_periodos = 9
 
 
     # if num_dias > 30, elif > 90 ...
@@ -112,7 +113,8 @@ def calcular_medias_intervalo(datos, desde, hasta, variable):
     #     arg = table["pollos_entrados"],
     #     window=3
     # )
-    return medias
+
+    return medias, periodos
 
 
 def search_function(query_params):
@@ -121,25 +123,43 @@ def search_function(query_params):
     # print("desde: ", query_params["desde"])
     # print("hasta: ", query_params["hasta"])
 
+    fecha_desde = datetime.strptime(query_params["desde"], "%Y-%m-%d")
+    fecha_hasta = datetime.strptime(query_params["hasta"], "%Y-%m-%d")
+    print("la fecha desde es: ", fecha_desde)
+    print("la fecha hasta es: ", fecha_hasta)
+
     if query_params["avicultor"] == "Todos":
         query = models.Camada.select().where(
-            (models.Camada.fecha >= query_params["desde"]) &
-            (models.Camada.fecha < query_params["hasta"])
+            (models.Camada.fecha >= fecha_desde) &
+            (models.Camada.fecha <= fecha_hasta)
         )
     else:
+        print("Aqui entras")
         query = (models.Camada
             .select(models.Camada, models.Integrado)
             .join(models.Integrado)
             .group_by(models.Camada.codigo_camada)
             .where(
-            (models.Camada.fecha >= query_params["desde"]) &
-            (models.Camada.fecha < query_params["hasta"]) &
-            (models.Camada.integrado.nombre_integrado == query_params["avicultor"]) &
-            (models.Camada.integrado == models.Integrado.nombre_integrado)
+                (models.Camada.fecha >= fecha_desde) &
+                (models.Camada.fecha <= fecha_hasta) &
+                (models.Camada.integrado.nombre_integrado ** query_params["avicultor"])
             )
         )
 
+
+    print("tipo fecha desde", type(query_params["desde"]))
+    print("tipo fecha hasta", type(query_params["hasta"]))
+
+
+    # integrados = models.Camada.select().where(models.Camada.integrado.nombre_integrado).dicts()
+    # for registro in integrados:
+    #     print(registro)
+
     df_query = pd.DataFrame(list(query.dicts()))
+
+
+
+    # print("dfquery: ", df_query)
 
     # cnx = sqlite3.connect('social.db')
     # df_query = pd.read_sql_query("SELECT * FROM camada", cnx)
@@ -150,18 +170,37 @@ def search_function(query_params):
     return df_query
 
 
-def grafico_evolucion_variables(medias, nombre_variable):
+def grafico_evolucion_variables(medias, periodos, nombre_variable):
     # Data for plotting
-    x = np.arange(0, len(medias), 1)
+
+    x = np.arange(0.5, len(medias) + 1, 1)
     y = medias
+    plt.twinx()
+
+
+    y_min = min(medias) - (min(medias) * 0.1)
+    y_max = max(medias) + (max(medias) * 0.1)
+    medias.append(0)
+
+    etiquetas_periodos = []
+    for periodo in periodos:
+        etiquetas_periodos.append(datetime.strftime(periodo, "%d-%m-%y"))
+
+    print(x)
 
     width = 0.5
     plt.clf()
-    barras = plt.bar(x, y, width, color='green')
 
-    # Se determina el eje de la y en función de los valores mínimos y máximos
-    plt.ylim(min(medias) - (min(medias) * 0.1),
-             max(medias) + (max(medias) * 0.1))
+    plt.figure(figsize=(13, 6))
+    barras = plt.bar(x+0.75, y, width, color='#87A556', edgecolor = "darkgreen")
+
+    plt.ylim(y_min, y_max)
+    # puntos = plt.plot(x, y, 'o', color='red')
+    # líneas = plt.plot(x+0.5, y, color='black')
+
+    # Se determina el eje 'y' en función de los valores mínimos y máximos
+    # plt.ylim(min(medias) - (min(medias) * 0.1),
+    #          max(medias) + (max(medias) * 0.1))
 
     # p1 = plt.bar(ind, menMeans, width, yerr=menStd)
 
@@ -171,7 +210,7 @@ def grafico_evolucion_variables(medias, nombre_variable):
     #     title='About as simple as it gets, folks'
     # )
 
-    plt.title(nombre_variable)
+    plt.title(nombre_variable.title().replace("_", " "), fontsize=20, pad=20, weight='bold')
 
     meses = (
         'ene',
@@ -195,38 +234,18 @@ def grafico_evolucion_variables(medias, nombre_variable):
         "4º trimestre"
     )
 
-    # N = 5
-    # menMeans = (20, 35, 30, 35, 27)
-    # womenMeans = (25, 32, 34, 20, 25)
-    # menStd = (2, 3, 4, 1, 2)
-    # womenStd = (3, 5, 2, 3, 3)
-    # ind = np.arange(N)  # the x locations for the groups
-    # width = 0.35  # the width of the bars: can also be len(x) sequence
-    #
-    # p1 = plt.bar(ind, menMeans, width, yerr=menStd)
-    # p2 = plt.bar(ind, womenMeans, width,
-    #              bottom=menMeans, yerr=womenStd)
-    #
-    # plt.ylabel('Scores')
-    # plt.title('Scores by group and gender')
-    # plt.xticks(ind, ('G1', 'G2', 'G3', 'G4', 'G5'))
-    # plt.yticks(np.arange(0, 81, 10))
-    # plt.legend((p1[0], p2[0]), ('Men', 'Women'))
-    #
-    # plt.show()
-
-    # El nombre de los meses son las etiquetas del eje x
+    print(etiquetas_periodos)
 
     if(len(medias) == 4):
-        plt.xticks(ticks=x, labels=trimestres, rotation=-45)
+        plt.xticks(ticks=x+0.25, labels=trimestres, horizontalalignment='left') # , rotation=-45
     else:
-        plt.xticks(ticks=x)
+        plt.xticks(ticks=x+0.25, labels=etiquetas_periodos, horizontalalignment='left')
 
-    plt.grid(barras, axis="y", alpha=0.1)
+    plt.grid(barras, axis="y", alpha=0.3)
 
     ruta_archivo_imagen = os.getcwd() + '/media/media_' + nombre_variable + '.svg'
 
-    plt.savefig(ruta_archivo_imagen, orientation="landscape", bbox_inches="tight", pad_inches=0.2)
+    plt.savefig(ruta_archivo_imagen, orientation="landscape", figsize=(19, 10), bbox_inches="tight", pad_inches=0.2)
     # plt.show()
 
     pass
@@ -266,6 +285,8 @@ def search():
     elementos_cabecera = []
     elementos_fila = []
     user = current_user
+    variables_mostradas = []
+    estadisticas = {}
 
     # query_params["num"] = request.form["num"]
     query_params["desde"] = request.form["desde"]
@@ -274,6 +295,7 @@ def search():
 
     # print("queryparams antes: ", query_params["ch_variables"]["pollos_entrados"])
 
+    # Se mantienen los valores de los check para una futura búsqueda
     for variable in query_params["ch_variables"]:
         query_params["ch_variables"][variable] = request.form.get(
             "ch_" + variable)
@@ -286,75 +308,98 @@ def search():
     table = search_function(query_params)
 
     # Aquí selecciono las variables a mostrar según el formulario en una lista
-    variables_mostradas = []
 
-    for variable in CONFIGURACION['variables']:
-        if request.form.get("ch_" + variable) == "on":
-            variables_mostradas.append(variable)
-        else:
-            # print("desactivado: ", variable)
-            if variable in variables_mostradas:
-                variables_mostradas.remove(variable)
+    if not table.empty:
 
-    for llave in table:
-        if(llave in variables_mostradas):
-            elementos_cabecera.append(llave.replace("_", " "))
-
-    estadisticas = {}
-
-    # Se rellena en el mismo orden que van a aparecer en la tabla
-    for variable in variables_mostradas:
-        if variable != "integrado": # no es una variable numérica
-            lista_por_variable = []
-
-            if variable == 'porcentaje_bajas':
-                lista_por_variable.append(
-                    "{} %".format(round((table[variable].mean() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                )
-                lista_por_variable.append(
-                    "{} %".format(round((table[variable].std() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                )
+        for variable in CONFIGURACION['variables']:
+            if request.form.get("ch_" + variable) == "on":
+                variables_mostradas.append(variable)
             else:
-                lista_por_variable.append(
-                    format((f'{table[variable].mean():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                )
-                lista_por_variable.append(
-                    format((f'{table[variable].std():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                )
+                # print("desactivado: ", variable)
+                if variable in variables_mostradas:
+                    variables_mostradas.remove(variable)
+
+        for llave in table:
+            if(llave in variables_mostradas):
+                elementos_cabecera.append(llave.replace("_", " "))
 
 
-            estadisticas[variable] = lista_por_variable
 
-    # print(estadisticas)
+        # Se rellena en el mismo orden que van a aparecer en la tabla
+        for variable in variables_mostradas:
+            if variable != "integrado": # no es una variable numérica
+                lista_por_variable = []
 
-    # print(elementos_cabecera)
+                if variable == 'porcentaje_bajas':
+                    lista_por_variable.append(
+                        "{} %".format(round((table[variable].mean() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
+                    )
+                    lista_por_variable.append(
+                        "{} %".format(round((table[variable].std() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
+                    )
+                    lista_por_variable.append(
+                        "{} %".format(round((table[variable].min() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
+                    )
+                    lista_por_variable.append(
+                        "{} %".format(round((table[variable].max() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
+                    )
+                    lista_por_variable.append(
+                        "{} %".format(round((table[variable].var() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
+                    )
+                else:
+                    lista_por_variable.append(
+                        format((f'{table[variable].mean():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    )
+                    lista_por_variable.append(
+                        format((f'{table[variable].std():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    )
+                    lista_por_variable.append(
+                        format((f'{table[variable].min():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    )
+                    lista_por_variable.append(
+                        format((f'{table[variable].max():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    )
+                    lista_por_variable.append(
+                        format((f'{table[variable].var():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
+                    )
 
-    # print(elementos_cabecera)
 
-    for i in table.index:
-        lista_auxiliar = []
-        for campo in variables_mostradas:
-            # Porcentaje
-            if campo == 'porcentaje_bajas':
-                valor = "{} %".format(round((table[campo][i] * 100), 2))
-            # Cadena de texto
-            elif campo == 'integrado':
-                valor = table[campo][i]
-            # separador de miles y sin decimales
-            elif campo in ['pollos_entrados', 'pollos_salidos', 'kilos_carne', 'kilos_pienso']:
-                valor = format((f'{table[campo][i]:,.0f}')).replace(',','~').replace('.',',').replace('~','.')
-            # separador de miles y 4 decimales
-            else:
-                valor = format((f'{table[campo][i]:,.4f}')).replace(',','~').replace('.',',').replace('~','.')
+                estadisticas[variable] = lista_por_variable
 
-            lista_auxiliar.append(valor)
+        # print(estadisticas)
 
-        # Se añade la fila
-        elementos_fila.append(lista_auxiliar)
+        # print(elementos_cabecera)
+
+        # print(elementos_cabecera)
+
+        for i in table.index:
+            lista_auxiliar = []
+            for campo in variables_mostradas:
+                # Porcentaje
+                if campo == 'porcentaje_bajas':
+                    valor = "{} %".format(round((table[campo][i] * 100), 2))
+                # Cadena de texto
+                elif campo == 'integrado':
+                    valor = table[campo][i]
+                # separador de miles y sin decimales
+                elif campo in ['pollos_entrados', 'pollos_salidos', 'kilos_carne', 'kilos_pienso']:
+                    valor = format((f'{table[campo][i]:,.0f}')).replace(',','~').replace('.',',').replace('~','.')
+                # separador de miles y 4 decimales
+                else:
+                    valor = format((f'{table[campo][i]:,.4f}')).replace(',','~').replace('.',',').replace('~','.')
+
+                lista_auxiliar.append(valor)
+
+            # Se añade la fila
+            elementos_fila.append(lista_auxiliar)
 
     # Coger el nombre de los avicultores disponible
     avicultores = models.Integrado.select(
-        models.Integrado.nombre_integrado).execute()
+        models.Integrado.nombre_integrado).dicts()
+
+    # print("avicultores:\n", avicultores)
+    # for avicultor in avicultores:
+    #     print(avicultor)
 
     # print(request.form["num"])
     # print("El numero de dias es: ", numero_dias_intervalo(query_params["desde"], query_params["hasta"]))
@@ -367,14 +412,18 @@ def search():
     # Se crean los gráficos
     for variable in variables_mostradas:
         if variable != "integrado":
-            medias = calcular_medias_intervalo(
+            medias, periodos = calcular_medias_intervalo(
                 datos=table,
                 desde=query_params["desde"],
                 hasta=query_params["hasta"],
                 variable=variable
             )
             # print("Las medias son: ", medias)
-            grafico_evolucion_variables(medias, nombre_variable=variable)
+            grafico_evolucion_variables(
+                periodos=periodos,
+                medias=medias,
+                nombre_variable=variable,
+            )
 
 
     # Se le pone una ruta distinta cada vez para que no cargue la img como estática
@@ -437,7 +486,7 @@ def table():
     }
 
     avicultores = models.Integrado.select(
-        models.Integrado.nombre_integrado).execute()
+        models.Integrado.nombre_integrado).dicts()
 
     form = forms.SearchForm()
 

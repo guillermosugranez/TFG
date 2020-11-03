@@ -60,6 +60,7 @@
                     next:       "Siguiente",
                     last:       "Último"
                 },
+                search:         "Buscar:",
                 info:           "Nº total de camadas encontradas: _TOTAL_.", /*_START_ - _END_*/
                 lengthMenu:     "Mostrar  _MENU_  camadas",
                 infoFiltered:   " (de _MAX_ camadas en total)",

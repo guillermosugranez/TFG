@@ -26,6 +26,8 @@
     overflow: auto;
 }
 
+select, select option {text-transform:capitalize}
+
 #table-variable-selector{
     //display: none; /* Por defecto no se muestra */
     padding: 5%;

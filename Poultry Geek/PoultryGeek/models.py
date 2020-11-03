@@ -1,4 +1,5 @@
 from datetime import datetime
+import numpy as np
 
 from flask_login import UserMixin
 from peewee import *
@@ -130,28 +131,6 @@ class User(UserMixin, Model):
 #         )
 
 
-class Tecnico(Model):
-    """"""
-
-    id_tecnico = AutoField()
-    nombre_tecnico = CharField(unique=True, null=False)
-
-    class Meta:
-        database = DATABASE
-
-    @classmethod
-    def create_tecnico(cls, nombre_tecnico):
-        try:
-            with DATABASE.transaction():
-                # Utiliza una transacción para realizar la operación de abajo
-                # Esto previene que la bbdd pueda quedar bloqueada por un error
-                cls.create(  # Crea un registro en la bbdd
-                    nombre_tecnico=nombre_tecnico,
-                )
-        except IntegrityError:
-            raise ValueError("Tecnico Already exists")
-
-
 class Provincia(Model):
     """"""
 
@@ -173,6 +152,21 @@ class Provincia(Model):
         except IntegrityError:
             raise ValueError("Provincia Already exists")
 
+
+    @classmethod
+    def get_list_provincias(cls):
+
+        provincias_registradas = cls.select(
+            cls.nombre_provincia).dicts()
+
+        lista_provincias_registradas = []
+
+        for provincia in provincias_registradas:
+            lista_provincias_registradas.append(provincia['nombre_provincia'])
+
+        print(lista_provincias_registradas)
+
+        return lista_provincias_registradas
 
 
 class Fabrica(Model):
@@ -197,6 +191,22 @@ class Fabrica(Model):
             raise ValueError("Fabrica Already exists")
 
 
+    @classmethod
+    def get_list_fabricas(cls):
+
+        fabricas_registradas = cls.select(
+            cls.nombre_fabrica).dicts()
+
+        lista_fabricas_registradas = []
+
+        for fabrica in fabricas_registradas:
+            lista_fabricas_registradas.append(fabrica['nombre_fabrica'])
+
+        print(lista_fabricas_registradas)
+
+        return lista_fabricas_registradas
+
+
 class Poblacion(Model):
     """"""
 
@@ -219,6 +229,60 @@ class Poblacion(Model):
             raise ValueError("Poblacion Already exists")
 
 
+    @classmethod
+    def get_list_poblaciones(cls):
+
+        poblaciones_registradas = cls.select(
+            cls.nombre_poblacion).dicts()
+
+        lista_poblaciones_registradas = []
+
+        for poblacion in poblaciones_registradas:
+            lista_poblaciones_registradas.append(poblacion['nombre_poblacion'])
+
+        print(lista_poblaciones_registradas)
+
+        return lista_poblaciones_registradas
+
+
+class Tecnico(Model):
+    """"""
+
+    id_tecnico = AutoField()
+    nombre_tecnico = CharField(unique=True, null=False)
+
+    class Meta:
+        database = DATABASE
+
+    @classmethod
+    def create_tecnico(cls, nombre_tecnico):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    nombre_tecnico=nombre_tecnico,
+                )
+        except IntegrityError:
+            raise ValueError("Tecnico Already exists")
+
+
+    @classmethod
+    def get_list_tecnicos(cls):
+
+        tecnicos_registradas = cls.select(
+            cls.nombre_tecnico).dicts()
+
+        lista_tecnicos_registradas = []
+
+        for tecnico in tecnicos_registradas:
+            lista_tecnicos_registradas.append(tecnico['nombre_tecnico'])
+
+        print(lista_tecnicos_registradas)
+
+        return lista_tecnicos_registradas
+
+
 
 class Integrado(Model):
     """Representa un granjero asociado a la integración"""
@@ -231,7 +295,7 @@ class Integrado(Model):
 
     )
 
-    codigo = CharField(null=False)
+    codigo = CharField(unique=True, null=False)
     nombre_integrado = CharField(unique=True, null=False)
 
     fabrica = ForeignKeyField(  # Los integrados los gestiona un usuario
@@ -271,6 +335,12 @@ class Integrado(Model):
         database = DATABASE  # Indica cuál es la bbdd del modelo
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at",)
+        constraints = [
+            Check('ditancia > 0'),
+            Check('ditancia < 100000'),
+            Check('metros_cuadrados > 0'),
+            Check('metros_cuadrados < 100000'),
+        ]
 
     # # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
     # def get_posts(
@@ -296,10 +366,16 @@ class Integrado(Model):
                     ditancia=ditancia,
                     metros_cuadrados=metros_cuadrados,
                 )
-                return True
-        except IntegrityError:
-            # raise ValueError("Integrado Already exists")
-            return False
+                return "ok"
+        except DatabaseError as err:
+            if str(err) == "CHECK constraint failed: integrado":
+                print(err)
+                return "error"
+            elif str(err) == "UNIQUE constraint failed: integrado.nombre_integrado":
+                return "existe"
+            else:
+                return "desconocido"
+
 
 
 class Camada(Model):
@@ -358,7 +434,23 @@ class Camada(Model):
         database = DATABASE  # Indica cuál es la bbdd del modelo
         constraints = [
             Check('pollos_entrados > 0'),
-
+            Check('pollos_salidos > 0'),
+            Check('porcentaje_bajas >= 0'),
+            Check('porcentaje_bajas <= 1'),
+            Check('kilos_carne > 0'),
+            Check('kilos_pienso > 0'),
+            Check('peso_medio > 0'),
+            Check('peso_medio < 5'),
+            Check('indice_transformacion > 0'),
+            Check('indice_transformacion < 5'),
+            Check('retribucion > 0'),
+            Check('retribucion < 1'),
+            Check('medicamentos_por_pollo > 0'),
+            Check('medicamentos_por_pollo < 1'),
+            Check('dias_media_retirada > 20'),
+            Check('dias_media_retirada < 70'),
+            Check('ganancia_media_diaria > 0'),
+            Check('ganancia_media_diaria < 1'),
         ]
         # Indica cómo serán ordenados los registros cuando sean creados
         # order_by = ("-joined_at",)
@@ -420,10 +512,59 @@ class Camada(Model):
                     porcentaje_bajas_matadero=porcentaje_bajas_matadero,
                     porcentaje_decomisos=porcentaje_decomisos,
                 )
-                return True
-        except IntegrityError:
-            # raise ValueError("Camada Already exists")
-            return False
+                return "ok"
+        except DatabaseError as err:
+            # print(err)
+            if str(err) == "CHECK constraint failed: camada":
+                return "error"
+            elif str(err) == "UNIQUE constraint failed: camada.codigo_camada":
+                return "existe"
+            else:
+                return "desconocido"
+
+
+    @classmethod
+    def get_fecha_ultima_camada(cls):
+
+        fecha = cls.select(
+            fn.Max(cls.fecha)).scalar()
+
+        fecha = datetime.strptime(fecha, "%Y-%m-%d")
+
+        return fecha
+
+
+    @classmethod
+    def get_fecha_ultima_camada(cls):
+
+        fecha = cls.select(
+            fn.Max(cls.fecha)).scalar()
+
+        fecha = datetime.strptime(fecha, "%Y-%m-%d")
+
+        return fecha
+
+    @classmethod
+    def get_media(cls, fecha, variable):
+
+        # print("la fecha es: ", fecha)
+        # print("la variables es: ", variable)
+        print("tipo es: ", type(fecha))
+
+        valores = cls.select(
+            Camada
+        ).where(
+            cls.fecha <= fecha
+        ).dicts()
+
+        lista_valores = []
+
+        for valor in valores:
+            # print(valor[variable])
+            lista_valores.append(valor[variable])
+
+        return np.array(lista_valores).mean()
+
 
 
 def initialize():

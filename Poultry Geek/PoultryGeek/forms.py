@@ -102,5 +102,7 @@ class SearchForm(FlaskForm):
     ch_dias_media_retirada = BooleanField("ch_dias_media_retirada", validators=[DataRequired()])
     ch_ganancia_media_diaria = BooleanField("ch_ganancia_media_diaria", validators=[DataRequired()])
 
+
+
     # email = StringField('Email', validators=[DataRequired(), Email()])
     # password = PasswordField('Password', validators=[DataRequired()])

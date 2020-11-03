@@ -1,0 +1,33 @@
+// bootrap.scss
+// Option A: Include all of Bootstrap
+
+$border-radius: 0.5rem;
+$enable-gradients: true;
+$enable-shadows: true;
+
+$theme-colors: (
+  "cyan":    #17a2b8,
+  "green":   #28a745,
+  "ubuntu_mate": #87A556,
+);
+
+// $().button('toggle')
+
+@import "node_modules/bootstrap/scss/bootstrap";
+// @import "/node_modules/bootstrap/scss/functions";
+
+
+//==============================================================================
+// Font Awesome
+
+$fa-font-path: "node_modules/fontawesome/webfonts";
+
+// @import "node_modules/bootstrap/scss/bootstrap";
+
+@import "node_modules/fontawesome/scss/fontawesome";
+@import "node_modules/fontawesome/scss/solid.scss";
+// @import "node_modules/fontawesome/scss/light.scss";
+@import "node_modules/fontawesome/scss/brands.scss";
+
+
+

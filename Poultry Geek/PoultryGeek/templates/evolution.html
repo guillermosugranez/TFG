@@ -7,116 +7,58 @@
             document.getElementById('ref-evolution').classList.add("active");
     </script>
 
+    {% if hay_datos %}
 
-    <div id="evolution-container-main" class="container-fluid">
+        <div id="evolution-container-main" class="container-fluid">
 
-        <div class="container-fluid" style="width:100%; height: auto">
-            <h1 id="evolution-h1" class="text-center text-dark">Evolución de la integración</h1>
-        </div>
-
-        <!-- Tarjetas de estadísticas -->
-        <div id="evolution-stats-cards" class="row container-fluid">
-
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Earnings (Monthly)</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="container-fluid" style="width:100%; height: auto">
+                <h1 id="evolution-h1" class="text-center text-dark"><strong>Evolución de la integración</strong></h1>
             </div>
+                <!-- Tarjetas de estadísticas -->
+                <div id="evolution-stats-cards" class="row container-fluid">
 
-            <!-- Earnings (Monthly) Card Example -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Earnings (Annual)</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Earnings (Monthly) Card Example -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col-auto">
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
+                    <li class="col mr-2 d-flex justify-content-center align-items-center" style="width:100%; height:15%; overflow:auto">
+                        {% for variable in variables_evolucion %}
+                        <!-- Earnings (Monthly) Card Example -->
+                        <div class="d-inline-block text-left container-fluid" style="width:300px; height:auto; padding:5px">
+                            <div style="" class="card border-left-success shadow-sm h-100 py-2">
+                                <div class="card-body" style="min-width:280px;">
+                                    <div class="container-fluid" style="width:100%; height: 80% !important; margin-bottom: 20px !important">
+                                        <div class="h6 font-weight-bold text-gray-800 text-center" style="margin-bottom: 15px; font-size: 17px;">{{variables_evolucion[variable].title().replace("_", " ")}}</div>
+                                        <div class="d-inline-block text-left" style="width: 40%; color:DarkGrey">{{informacion_tarjetas.fecha_anterior}}</div><div class="d-inline-block text-right" style="width: 60%; color:DarkGrey">{{informacion_tarjetas[variable].media_anterior}}</div>
+                                        <div class="d-inline-block text-left" style="width: 40%">{{informacion_tarjetas.ultima_fecha}}</div><div class="d-inline-block text-right text-{{informacion_tarjetas[variable].color}} font-weight-bold" style="width: 60%;">{{informacion_tarjetas[variable].media_ultima}}</div>
                                     </div>
-                                    <div class="col">
-                                        <div class="progress progress-sm mr-2">
-                                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
+                                    <div class="container-fluid text-center align-items-baseline" style="height:32px !important">
+                                        <i class="fas fa-{{informacion_tarjetas[variable].icono}} fa-2x text-gray-300" style="color:{{tema[variable]}}"></i>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-auto">
-                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                        {% endfor %}
+                    </li>
+
+                <div class="container-fluid text-center" style="">
+
+                    {% for variable in variables_evolucion %}
+                        <div id="card-{{variable}}" class="container-fluid" style="margin-top:50px; margin-bottom:50px">
+                            <h3 style="margin-bottom:20px;"><strong>{{variables_evolucion[variable]}}</strong></h3>
+                            <div class="shadow container-fluid text-center" style="overflow:auto;">
+
+                                <img src="{{ url_for('download_file', filename='evolution_' + variable + '.svg') }}?{{url_variable}}" alt="gráfico de la evolucion de {{variable}}">
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    {% endfor %}
 
-            <!-- Pending Requests Card Example -->
-            <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Requests</div>
-                                <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-comments fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </div>
-
         </div>
 
-        <div class="container-fluid text-center" style="width: 100%">
+    {% else %}
 
-            {% for variable in variables_evolucion %}
-                <h3>{{variable}}</h3>
-                <div id="card-{{variable}}" class=" row container-fluid" style="width:100%; margin: 1% !important; padding-right: 30px">
-                    <div class="card-body shadow container-fluid text-center" style="width:100%; overflow:auto;; margin: 1%; margin:1%">
-
-                        <img src="{{ url_for('download_file', filename='evolution_' + variable + '.svg') }}?{{url_variable}}" alt="grafico de la evolucion de {{variable}}">
-                    </div>
-                </div>
-            {% endfor %}
-
+        <div class="d-flex justify-content-center align-items-center text-center" style="width:100%; height:100%">
+            <h1 style="width:40%;">Su lista de camadas está vacía.<br><br>Vaya a la seccón <a href="{{ url_for('load_data') }}">"Subir Datos"</a> para poder empezar a usar Poultry Geek!</h1>
         </div>
 
-<!--        <div id="card-indice_transformacion" class=" row container-fluid">-->
-<!--            <div class="card-body shadow">-->
-<!--                <p>indice_transformacion</p>-->
-<!--                <img src="{{ url_for('download_file', filename='evolution_indice_transformacion.svg') }}?{{url_variable}}" alt="grafico de media">-->
-<!--            </div>-->
-<!--        </div>-->
-
-    </div>
+    {% endif %}
 
 {% endblock %}
 

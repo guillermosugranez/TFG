@@ -12,7 +12,7 @@
     <div class="container" id="load_data-box-start">
 <!--        <h2 class="text-center text-dark">Poultry Geek</h2>-->
     </div>
-    <div class="container border border-dark rounded" id="load_data-box">
+    <div class="container border border-dark rounded shadow" id="load_data-box">
         <form id="load_data-form" class="form container-fluid" enctype=multipart/form-data action="" method="post">
             {{ form.hidden_tag() }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
             <h3 class="text-center text-dark pb-4">Subir archivo</h3>
@@ -20,53 +20,60 @@
                 <div class="input-group">
                     <div class="custom-file">
                         <input type="file" name="file" class="custom-file-input" id="customFile">
-                        <label class="custom-file-label lang="es"" for="customFile">Seleccione el archivo</label>
+                        <label class="custom-file-label" for="customFile" lang="es" data-label="Examinar">Seleccione el archivo...</label>
                     </div>
                 </div>
             </div>
             <div class="form-group d-flex justify-content-end">
-                <input type="submit" name="submit" class="btn btn-dark text-white btn-md" value="Subir Datos">
+                <input type="submit" name="submit" class="btn bg-gradient-ubuntu_mate text-white btn-block border border-dark" value="Subir Datos">
             </div>
 
+            <!--Nombres erroneos-->
             <div class="form-group" style="margin-top: 10%">
-
-                {% if resultado_subida.n_nombre_fabrica > 0 %}
-                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
-                        <li class="list-group-item bg-dark text-white text-center"><strong>Fábricas no registradas</strong></li>
-                        {% for nuevo_nombre_fabrica in resultado_subida.nombre_fabrica %}
-                            <li class="list-group-item">{{ nuevo_nombre_fabrica }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
-                {% if resultado_subida.n_nombre_provincia > 0 %}
-                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
-                        <li class="list-group-item bg-dark text-white text-center"><<strong>Provincias no registradas</strong></li>
-                        {% for nuevo_nombre_provincia in resultado_subida.nombre_provincia %}
-                            <li class="list-group-item">{{ nuevo_nombre_provincia }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
-                {% if resultado_subida.n_nombre_tecnico > 0 %}
-                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
-                        <li class="list-group-item bg-dark text-white text-center"><strong>Técnicos no registradas</strong></li>
-                        {% for nuevo_nombre_tecnico in resultado_subida.nombre_tecnico %}
-                            <li class="list-group-item">{{ nuevo_nombre_tecnico }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
-                {% if resultado_subida.n_nombre_poblacion > 0 %}
-                    <ul class="list-group list-group-flush rounded" style="margin: 5%">
-                        <li class="list-group-item bg-dark text-white text-center"><strong>Poblaciones no registradas</strong></li>
-                        {% for nuevo_nombre_poblacion in resultado_subida.nombre_poblacion %}
-                            <li class="list-group-item">{{ nuevo_nombre_poblacion }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                <!-- Si en la lista de cada variable hay elementos...-->
+                {% for variable in variables %}
+                    {% if resultado_subida[variable]|length > 0 %}
+                        <ul class="list-group list-group-flush rounded border border-dark" style="margin-top: 10%">
+                            <li class="list-group-item bg-gradient-secondary text-white text-center"><strong>{{variables[variable]}}</strong></li>
+                            {% for nuevo_nombre in resultado_subida[variable] %}
+                                <li class="list-group-item"><strong>{{ nuevo_nombre.title() }}</strong></li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
 
             </div>
+
+            <!--Descripción de errores (Si hay...)-->
+            {% if resultado_subida.lineas_error|length > 0 %}
+            <div>
+                <!-- Se pone el punto porque se quiere acceder a un 'atributo' de un 'PARAMETRO' de la vista-->
+                <ul class="list-group list-group-flush rounded border border-dark" style="margin-top: 10%">
+                    <li class="list-group-item bg-gradient-secondary text-white text-center"><strong>Las siguientes líneas de la tabla continen errores:</strong></li>
+                    <li class="list-group-item container-fluid" style="width:100%; background:#E8E8E8">
+                        <div class="d-inline-block text-center" style="width:15%"><strong>Línea</strong></div><div class="d-inline-block text-center" style="width:85%"><strong>Tipo de error</strong></div>
+                    </li>
+                    {% for error in resultado_subida.lineas_error %}
+                        {% for linea, tipo_error in error.items() %}
+                            <li class="list-group-item container-fluid" style="width:100%">
+                                {% if tipo_error == "Esta camada ya existe."%}
+                                    <div class="d-inline-block text-left" style="width:10%"><strong>{{linea}}</strong></div><div class="d-inline-block text-center" style="width:90%; color:DarkRed">{{tipo_error}}</div>
+                                {% endif %}
+                                {% if tipo_error == "Nombre incorrecto o no registrado."%}
+                                    <div class="d-inline-block text-left" style="width:10%"><strong>{{linea}}</strong></div><div class="d-inline-block text-center" style="width:90%; color:DarkBlue">{{tipo_error}}</div>
+                                {% endif %}
+                                {% if tipo_error == "Fecha no válida."%}
+                                    <div class="d-inline-block text-left" style="width:10%"><strong>{{linea}}</strong></div><div class="d-inline-block text-center" style="width:90%; color:DarkOliveGreen">{{tipo_error}}</div>
+                                {% endif %}
+                                {% if tipo_error == "Error desconocido."%}
+                                    <div class="d-inline-block text-left" style="width:10%"><strong>{{linea}}</strong></div><div class="d-inline-block text-center" style="width:90%; color:DarkOrange">{{tipo_error}}</div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
 
         </form>
     </div>

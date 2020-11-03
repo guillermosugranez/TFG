@@ -9,7 +9,7 @@
 
 <div class="container-fluid" id="table-container-main">
     <!-- Búsqueda -->
-    <div class="container border rounded" id="table-container-left">
+    <div class="container border rounded shadow" id="table-container-left">
         <h2 id="table-h2-0">Búsqueda</h2>
         <!-- MUY IMPORTANTE que action=search para poder hacer la búsqueda-->
         <form id="table-form" class="form container-fluid" action="search" method="post">
@@ -46,10 +46,10 @@
                         <select class="form-control container" name="avicultor" type="text" id="form-table-avicultor" style="width: 250px;">
                             <option>Todos</option>
                             {% if query_params.avicultor != "Todos" %}
-                                <option selected>{{ query_params.avicultor }}</option>
+                                <option selected>{{ query_params.avicultor.title() }}</option>
                             {% endif %}
                             {% for avicultor in avicultores %}
-                                <option>{{ avicultor }}</option>
+                                <option>{{ avicultor['nombre_integrado'] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -65,22 +65,20 @@
                                 {% else %}
                                     <input class="form-check-input" data="True" name="ch_{{variable}}" for="table-chek-{{variable}}" type="checkbox">
                                 {% endif %}
-                                <label class="form-check-label">{{variable}}</label>
+                                <label class="form-check-label">{{variable.title().replace("_", " ")}}</label>
                             </div>
                     {% endfor %}
                 </div>
-
-                <!-- Botón Buscar -->
-                <div class="form-group row container-fluid justify-content-center">
-                    <button type="submit" class="btn btn-dark text-white btn-md">Buscar</button>
-                </div>
-
+            </div>
+            <!-- Botón Buscar -->
+            <div class="form-group">
+                <button type="submit" class="btn bg-gradient-ubuntu_mate text-white btn-block border border-dark rounded">Buscar</button>
             </div>
         </form>
     </div>
 
     <!-- Datos -->
-    <div class="container-fluid border rounded" id="table-container-right">
+    <div class="container-fluid border rounded shadow" id="table-container-right">
         {% if elementos_cabecera %}
 
             <!-- Nav -->
@@ -132,8 +130,10 @@
                                 query_params.hasta}}</th>
                             <th scope="col">Media</th>
                             <th scope="col">Desviación Típica</th>
+                            <th scope="col">Mínimo</th>
+                            <th scope="col">Máximo</th>
 <!--                            <th scope="col">Moda</th>-->
-<!--                            <th scope="col">Varianza</th>-->
+                            <th scope="col">Varianza</th>
                         </tr>
                     </thead>
 
@@ -158,17 +158,21 @@
             <div class="container-fluid justify-content-start collapse" id="table-container-graphics" style="display: none; ">
                 {% for variable in query_params.variables %}
                     {% if query_params.ch_variables[variable] == 'on' and variable != "integrado" %}
-                        <div class="container border" style="display:flex; width:50%; height:auto; padding: 1%; justify-content: center;">
-<!--                            <img src="/graphics/media_{{variable}}.svg" alt="El mejor presidente de la historia">-->
+                        <a class="container border" style="display:flex; width:49%; height:auto; padding: 1%; justify-content: center;" href="{{ url_for('download_file', filename='media_' + variable + '.svg') }}?{{url_variable}}" data-featherlight="image">
                             <img src="{{ url_for('download_file', filename='media_' + variable + '.svg') }}?{{url_variable}}" alt="grafico de media">
-
-                        </div>
+                        </a>
                     {% endif %}
                 {% endfor %}
 
             </div>
 
+        {% else %}
+            <div class="d-flex justify-content-center align-items-center" style="width:100%; height:100%">
+                <h5>No se encontraron resultados con los actuales parámatros de búsqueda</h5>
+            </div>
         {% endif %}
+
+
     </div>
 </div>
 
