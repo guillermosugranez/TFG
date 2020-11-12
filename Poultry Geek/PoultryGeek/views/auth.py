@@ -33,7 +33,9 @@ def register():
         models.User.create_user(  # Ahora podemos crear el usuario
             username=form.username.data,
             email=form.email.data,
-            password=form.password.data
+            password=form.password.data,
+            is_active=False,
+            is_admin=False
         )
         return redirect(url_for('index'))
     return render_template('register.html', form=form)
@@ -53,9 +55,16 @@ def login():
             flash('Tu nombre de usuario o contraseña no existe', 'danger')
         else:  # Si el usuario si existe hay que comprobar su contraseña
             if check_password_hash(user.password, form.password.data):
-                login_user(user)  # Se loguea con la librería de flask
-                flash('Has iniciado sesión', 'success')
-                return redirect(url_for('evolution'))
+                # Hay que comprobar que el usuario haya sido dado de alta en el
+                # sistema por el administrador.
+                # print("resultado", models.User.user_is_active(form.email.data))
+                if models.User.user_is_active(form.email.data):
+                    login_user(user)  # Se loguea con la librería de flask
+                    flash('Has iniciado sesión', 'success')
+                    return redirect(url_for('evolution'))
+                else:
+                    flash('No has sido dado de alta. Contacta con p92supeg@uco.es para poder acceder a poultry Geek', 'danger')
+                    return redirect(url_for('login'))
             else:
                 flash('Tu nombre de usuario o contraseña no existe', 'danger')
 

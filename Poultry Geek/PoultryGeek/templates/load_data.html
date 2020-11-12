@@ -8,11 +8,11 @@
             document.getElementById('ref-UploadData').classList.add("active");
     </script>
 
-<div id="load_data" class="container-fluid" style="position: relative">
+<div id="load_data" class="container-fluid" style="position: relative; min-width: 400px">
     <div class="container" id="load_data-box-start">
 <!--        <h2 class="text-center text-dark">Poultry Geek</h2>-->
     </div>
-    <div class="container border border-dark rounded shadow" id="load_data-box">
+    <div class="container border border-dark rounded shadow" style="min-width: 400px" id="load_data-box">
         <form id="load_data-form" class="form container-fluid" enctype=multipart/form-data action="" method="post">
             {{ form.hidden_tag() }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
             <h3 class="text-center text-dark pb-4">Subir archivo</h3>

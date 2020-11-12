@@ -9,12 +9,12 @@
         <div class="container border border-dark rounded" id="register-box">
             <form id="register-form" class="form container-fluid" action="" method="post">
                 {{ form.hidden_tag() }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
-                <h3 class="text-center text-dark pb-4">Regístrate</h3>
+                <h3 class="text-center text-dark pb-4 font-weight-bold">Registro de Usuario</h3>
                 {% for field in form %}
                     {{ render_field(field) }}
                 {% endfor %}
                 <div class="form-group">
-                    <input type="submit" name="submit" class="btn btn-md btn-dark text-white" value="Registrar">
+                    <input type="submit" name="submit" class="btn btn-md btn-dark text-white" value="Registrarse">
                 </div>
             </form>
         </div>

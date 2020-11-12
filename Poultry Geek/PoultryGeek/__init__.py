@@ -7,7 +7,8 @@ import os
 # url_for es para generar una url a un cierto endpoint
 # abort te permite salir de la vista actual
 import scss as scss
-from flask import (Flask, g, render_template, send_from_directory)
+import werkzeug
+from flask import (Flask, g, render_template, send_from_directory, flash)
 # SASS compiler
 from flask_bootstrap import Bootstrap
 
@@ -32,6 +33,7 @@ from flask_login import (LoginManager, current_user, AnonymousUserMixin)
 # App
 from PoultryGeek import forms  # LoginForm, RegisterForm
 from PoultryGeek import models
+from PoultryGeek.prediction.prediction import evolution_error
 
 DEBUG = True  # Mayúsculas indica que es global (por convenio)
 PORT = 8000
@@ -55,7 +57,7 @@ CONFIGURACION = {
 
     'variables_evolucion_tema'      : {
         'indice_transformacion': 'DarkBlue',
-        'peso_medio': 'darkcyan',
+        'peso_medio': 'DarkOrange',
         'porcentaje_bajas': 'DarkRed',
         'retribucion': 'DarkGreen',
         'ganancia_media_diaria': 'darkgoldenrod'
@@ -68,6 +70,7 @@ CONFIGURACION = {
         'nombre_poblacion'      : 'Poblaciones no Registradas',
     }
 }
+
 
 
 # Se instancia la aplicación
@@ -115,6 +118,7 @@ assets.register('main_css', CSS)
 # assets.register('bootstrap', scss)
 
 from PoultryGeek.views import auth, evolution, load_data, table
+from PoultryGeek.prediction import prediction # Para los algoritmos
 
 # Blueprint
 # Los blueprints se usan para poder hacer las rutas desde otros archivos
@@ -122,6 +126,7 @@ app.register_blueprint(auth.bp)
 app.register_blueprint(load_data.bp)
 app.register_blueprint(table.bp)
 app.register_blueprint(evolution.bp)
+app.register_blueprint(prediction.bp)
 
 
 # ensure the instance folder exists
@@ -145,8 +150,17 @@ app.add_url_rule("/evolution", endpoint="evolution")
 app.config['FLASK_ADMIN_SWATCH'] = 'slate'  # Tema para la administracion
 admin = Admin(app, name='Poultry Geek', template_mode='bootstrap3')
 
+class UserModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_admin
+
+    # create_template = "register.html"
+    can_delete = True  # disable model deletion
+    page_size = 50  # the number of entries to display on the list view
+
 def admin_loader():
-    admin.add_view(ModelView(models.User)) # Reservado para superuser
+    # admin.add_view(ModelView(models.User)) # Reservado para superuser
+    admin.add_view(UserModelView(models.User))
     admin.add_view(ModelView(models.Integrado))
     admin.add_view(ModelView(models.Camada))
     admin.add_view(ModelView(models.Tecnico))
@@ -209,12 +223,24 @@ def load_user(userid):
 # Se le pone una ruta distinta cada vez para que no cargue la img como estática
 @app.route('/media/<path:filename>?')
 def download_file(filename):
-    return send_from_directory(app.config['MEDIA_FOLDER'], filename, as_attachment=True)
+    return send_from_directory(
+        app.config['MEDIA_FOLDER'], filename, as_attachment=True)
 
 
 @app.errorhandler(404)
 def not_found(error):
     return render_template('404.html')
+
+
+
+
+@app.errorhandler(evolution_error)
+def handle_512(error):
+    flash(
+        "Se ha tratado de presentar la evolución pero ha habido un error. "
+        "Compruebe que en todos los meses haya al menos una camada para poder "
+        "mostrar la evolución", 'danger')
+    return render_template('index.html')
 
 
 @app.route('/')
@@ -233,11 +259,15 @@ if __name__ == "__main__":
 
 
     # Carga algunos datos para poder empezar con la aplicación
+
+    # Lo primero es añadir un usuario administrador
     try:
         models.User.create_user(
             username='Guille',
-            email='guillecor91@gmail.com',
-            password="1234"  # Tiene que ser una cadena
+            email='p92supeg@uco.es',
+            password="1234",  # Tiene que ser una cadena
+            is_admin=True,
+            is_active=True
         )
     except ValueError:  # Si el usuario ya está en la bbdd
         pass
@@ -285,6 +315,7 @@ if __name__ == "__main__":
 
     admin_loader()
     app.run(debug=DEBUG, host=HOST, port=PORT)
+    app.register_error_handler(evolution_error, handle_512)
 
 
 # ==============================================================================

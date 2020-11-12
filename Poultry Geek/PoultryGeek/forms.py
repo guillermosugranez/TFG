@@ -32,7 +32,7 @@ def email_exists(form, field):
 
 class RegisterForm(FlaskForm):
     username = StringField(
-        'Username',
+        'Nombre de usuario',
         validators=[
             DataRequired(),
             Regexp(
@@ -42,7 +42,7 @@ class RegisterForm(FlaskForm):
         ]
     )
     email = StringField(
-        'Email',
+        'Correo electrónico',
         validators=[
             DataRequired(),  # No puede ser un campo vacío
             Email(),  # Tiene que tener forma de eMail
@@ -50,7 +50,7 @@ class RegisterForm(FlaskForm):
         ]
     )
     password = PasswordField(
-        'Password',
+        'Contraseña',
         validators=[
             DataRequired(),
             Length(min=4),
@@ -58,7 +58,7 @@ class RegisterForm(FlaskForm):
         ]
     )
     password2 = PasswordField(
-        'Confirm Password',
+        'Confirme la contraseña',
         validators=[
             DataRequired()  # Solo debe existir
         ]
@@ -66,14 +66,14 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    email = StringField('Correo electrónico', validators=[DataRequired(), Email()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
 
 
-class PostForm(FlaskForm):
-    """Formulario para el contenido del Post. Hace falta escribir algo"""
-
-    content = TextAreaField('Qué piensas', validators=[DataRequired()])
+# class PostForm(FlaskForm):
+#     """Formulario para el contenido del Post. Hace falta escribir algo"""
+#
+#     content = TextAreaField('Qué piensas', validators=[DataRequired()])
 
 
 class LoadDataForm(FlaskForm):

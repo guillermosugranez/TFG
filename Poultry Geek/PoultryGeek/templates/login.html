@@ -13,12 +13,12 @@ similitud-->
     <div class="container border border-dark rounded" id="login-box">
         <form id="login-form" class="form container-fluid" action="" method="post">
             {{ form.hidden_tag() }} <!--Despliega una variable en forma HTML (sin paréntresis); hidden_tag se usa por temas de seguridad-->
-            <h3 class="text-center text-dark pb-4">Inicio de sesion</h3>
+            <h3 class="text-center text-dark pb-4 font-weight-bold">Inicio de sesión</h3>
             {% for field in form %}
                 {{ render_field(field) }}
             {% endfor %}
             <div class="form-group">
-                <input type="submit" name="submit" class="btn btn-dark text-white btn-md" value="Login">
+                <input type="submit" name="submit" class="btn btn-dark text-white btn-md" value="Iniciar Sesión">
                 <a href="{{ url_for('register') }}" class="text-right btn btn-dark text-white btn-md ">Registrarse</a>
             </div>
         </form>

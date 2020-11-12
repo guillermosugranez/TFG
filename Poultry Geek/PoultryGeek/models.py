@@ -5,7 +5,7 @@ from flask_login import UserMixin
 from peewee import *
 from flask_bcrypt import generate_password_hash
 
-DATABASE = SqliteDatabase("social.db")
+DATABASE = SqliteDatabase('poultrygeek.db')
 
 # Lo más esencial en una red social son los usuarios.
 # Hay que definir un modelo que los represente
@@ -13,10 +13,12 @@ DATABASE = SqliteDatabase("social.db")
 
 class User(UserMixin, Model):
     username = CharField(unique=True)
-    email = CharField(unique=True)
+    email = CharField(unique=True, null=False)
     password = CharField(max_length=120)
     # Asegurarse de que now es el atributo y no la función
     joined_at = DateTimeField(default=datetime.now)
+    is_admin = BooleanField(default=False)
+    is_active = BooleanField(default=False)
 
     # La clase Meta sirve para tener en cuenta los metadatos del modelo
     # Cualquier modelo necesita la class Meta
@@ -25,6 +27,49 @@ class User(UserMixin, Model):
         database = DATABASE  # Indica cuál es la bbdd del modelo
         # Indica cómo serán ordenados los registros cuando sean creados
         order_by = ("-joined_at",)
+
+
+    @classmethod
+    def create_user(cls, username, email, password, is_admin, is_active):
+        try:
+            with DATABASE.transaction():
+                # Utiliza una transacción para realizar la operación de abajo
+                # Esto previene que la bbdd pueda quedar bloqueada por un error
+                cls.create(  # Crea un registro en la bbdd
+                    username=username,
+                    email=email,
+                    password=generate_password_hash(password),
+                    is_admin=is_admin,
+                    is_active=is_active
+                )
+        except IntegrityError:
+            raise ValueError("User Already exists")
+
+
+    def get_camadas(self):
+        """Devuelve un diccionario con todas las camadas asociadas"""
+
+        # camadas = Camada.select().join(Integrado).where(Camada.integrado.user == self)
+        camadas = Camada.select()
+
+        return camadas
+
+
+    @classmethod
+    def user_is_active(cls, email):
+        """Permite determinar si un usuario está dado de alta en el sistema
+        a partir de su correo electrónico"""
+
+        user = cls.select().where(cls.email == email).get()
+
+        print("resultado en clase es:", user.is_active)
+
+        return user.is_active
+
+
+    # Métodos de instancia
+    # def is_admin(self):
+    #     return self.is_admin
 
     # Nuevo método lección 51. (Método de instancia (del objeto User concreto))
     # def get_posts(self):  # Primero coge todos, luego filtra al objeto que llama
@@ -81,19 +126,6 @@ class User(UserMixin, Model):
     # en lugar de:
     #   usuario = User() -> primero se crea la instancia
     #   usuario.create_user(aldo,aldo,aldo) -> luego se vuelve a crear?
-    @classmethod
-    def create_user(cls, username, email, password):
-        try:
-            with DATABASE.transaction():
-                # Utiliza una transacción para realizar la operación de abajo
-                # Esto previene que la bbdd pueda quedar bloqueada por un error
-                cls.create(  # Crea un registro en la bbdd
-                    username=username,
-                    email=email,
-                    password=generate_password_hash(password),
-                )
-        except IntegrityError:
-            raise ValueError("User Already exists")
 
 
 # class Post(Model):
@@ -296,7 +328,7 @@ class Integrado(Model):
     )
 
     codigo = CharField(unique=True, null=False)
-    nombre_integrado = CharField(unique=True, null=False)
+    nombre_integrado = CharField(unique=False, null=False)
 
     fabrica = ForeignKeyField(  # Los integrados los gestiona un usuario
         Fabrica,
@@ -432,6 +464,7 @@ class Camada(Model):
     # Añade información extra, al margen de los atributos, métodos... etc.
     class Meta:
         database = DATABASE  # Indica cuál es la bbdd del modelo
+        order_by = ('-fecha',)
         constraints = [
             Check('pollos_entrados > 0'),
             Check('pollos_salidos > 0'),
@@ -535,21 +568,22 @@ class Camada(Model):
 
 
     @classmethod
-    def get_fecha_ultima_camada(cls):
+    def get_fecha_primera_camada(cls):
 
         fecha = cls.select(
-            fn.Max(cls.fecha)).scalar()
+            fn.Min(cls.fecha)).scalar()
 
         fecha = datetime.strptime(fecha, "%Y-%m-%d")
 
         return fecha
+
 
     @classmethod
     def get_media(cls, fecha, variable):
 
         # print("la fecha es: ", fecha)
         # print("la variables es: ", variable)
-        print("tipo es: ", type(fecha))
+        # print("tipo es: ", type(fecha))
 
         valores = cls.select(
             Camada

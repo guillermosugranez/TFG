@@ -9,7 +9,7 @@
 
 <div class="container-fluid" id="table-container-main">
     <!-- Búsqueda -->
-    <div class="container border rounded shadow" id="table-container-left">
+    <div class="container border rounded shadow" id="table-container-left" style="min-width: 260px">
         <h2 id="table-h2-0">Búsqueda</h2>
         <!-- MUY IMPORTANTE que action=search para poder hacer la búsqueda-->
         <form id="table-form" class="form container-fluid" action="search" method="post">
@@ -40,10 +40,14 @@
 <!--                </div>-->
 
                 <!-- Avicultor -->
-                <div class="form-group row">
-                    <label for="form-table-avicultor" class="col col-form-label"><strong>Avicultor:</strong></label>
-                    <div class="col">
-                        <select class="form-control container" name="avicultor" type="text" id="form-table-avicultor" style="width: 250px;">
+
+
+                <div class="form-group">
+                    <div class="row">
+                        <label for="form-table-avicultor" class="col col-form-label"><strong>Avicultor:</strong></label>
+                    </div>
+                    <div class="row justify-content-center" style="margin:1%">
+                        <select class="form-control container" name="avicultor" type="text" id="form-table-avicultor">
                             <option>Todos</option>
                             {% if query_params.avicultor != "Todos" %}
                                 <option selected>{{ query_params.avicultor.title() }}</option>
@@ -167,8 +171,10 @@
             </div>
 
         {% else %}
-            <div class="d-flex justify-content-center align-items-center" style="width:100%; height:100%">
-                <h5>No se encontraron resultados con los actuales parámatros de búsqueda</h5>
+            <div class="d-flex justify-content-center align-items-center text-center" style="width:100%; height:100%">
+                <div style="margin: 50%">
+                    <h5 style="min-width: 300px">No se encontraron resultados con los actuales parámatros de búsqueda</h5>
+                </div>
             </div>
         {% endif %}
 

@@ -5,7 +5,7 @@ import math
 import time
 from datetime import datetime
 
-from flask import (render_template, url_for, redirect, request)
+from flask import (render_template, url_for, redirect, request, g)
 from flask_login import (login_required,
                          current_user)
 
@@ -125,13 +125,16 @@ def search_function(query_params):
 
     fecha_desde = datetime.strptime(query_params["desde"], "%Y-%m-%d")
     fecha_hasta = datetime.strptime(query_params["hasta"], "%Y-%m-%d")
-    print("la fecha desde es: ", fecha_desde)
-    print("la fecha hasta es: ", fecha_hasta)
+    # print("la fecha desde es: ", fecha_desde)
+    # print("la fecha hasta es: ", fecha_hasta)
 
     if query_params["avicultor"] == "Todos":
-        query = models.Camada.select().where(
-            (models.Camada.fecha >= fecha_desde) &
-            (models.Camada.fecha <= fecha_hasta)
+        query = (models.Camada
+            .select()
+            .where(
+                (models.Camada.fecha >= fecha_desde) &
+                (models.Camada.fecha <= fecha_hasta)
+            )
         )
     else:
         print("Aqui entras")
@@ -147,8 +150,8 @@ def search_function(query_params):
         )
 
 
-    print("tipo fecha desde", type(query_params["desde"]))
-    print("tipo fecha hasta", type(query_params["hasta"]))
+    # print("tipo fecha desde", type(query_params["desde"]))
+    # print("tipo fecha hasta", type(query_params["hasta"]))
 
 
     # integrados = models.Camada.select().where(models.Camada.integrado.nombre_integrado).dicts()
@@ -169,22 +172,70 @@ def search_function(query_params):
 
     return df_query
 
+def dar_formato(nombre_variable, valor):
 
-def grafico_evolucion_variables(medias, periodos, nombre_variable):
+    valor_formateado = ""
+
+    if nombre_variable == 'porcentaje_bajas':
+        valor_formateado = (
+            "{} %".format(round((valor * 100), 2))
+        )
+    else:
+        valor_formateado = (
+            "{}".format((f'{valor:,.3f}'))
+
+        )
+
+    valor_formateado = (
+        valor_formateado
+            .replace(',', '~')
+            .replace('.', ',')
+            .replace('~', '.')
+    )
+
+    return  valor_formateado
+
+
+def autolabel(barras):
+    """Attach a text label above each bar in *rects*, displaying its height."""
+
+    for rect in barras:
+        height = rect.get_height()
+        plt.annotate(
+            "{}".format((f'{height:,.3f}')).replace(',', '~').replace('.', ',').replace('~', '.'),
+            xy=(rect.get_x() + rect.get_width() / 2, height),
+            xytext=(0, 3),  # 3 points vertical offset
+            textcoords="offset points",
+            ha='center',
+            va='bottom',
+            fontweight='bold'
+        )
+
+
+def crear_graficos_sobre_consultas(medias, periodos, nombre_variable):
     # Data for plotting
 
-    x = np.arange(0.5, len(medias) + 1, 1)
+    lista_periodos = []
+
+    x = np.arange(0.5, len(medias))
     y = medias
     plt.twinx()
 
-
     y_min = min(medias) - (min(medias) * 0.1)
     y_max = max(medias) + (max(medias) * 0.1)
-    medias.append(0)
 
     etiquetas_periodos = []
+    periodo_anterior = None
+
     for periodo in periodos:
-        etiquetas_periodos.append(datetime.strftime(periodo, "%d-%m-%y"))
+        try:
+            etiquetas_periodos.append(
+                "[" +datetime.strftime(periodo_anterior, "%d-%m-%y") + "\n" +
+                datetime.strftime(periodo, "%d-%m-%y") + "]"
+            )
+            periodo_anterior = periodo
+        except:
+            periodo_anterior = periodo
 
     print(x)
 
@@ -192,56 +243,23 @@ def grafico_evolucion_variables(medias, periodos, nombre_variable):
     plt.clf()
 
     plt.figure(figsize=(13, 6))
-    barras = plt.bar(x+0.75, y, width, color='#87A556', edgecolor = "darkgreen")
+    try:
+        barras = plt.bar(x, y, width, color=CONFIGURACION["variables_evolucion_tema"][nombre_variable], edgecolor='grey')
+    except KeyError:
+        barras = plt.bar(x, y, width, color='#87A556',
+                         edgecolor='grey')
 
     plt.ylim(y_min, y_max)
-    # puntos = plt.plot(x, y, 'o', color='red')
-    # líneas = plt.plot(x+0.5, y, color='black')
-
-    # Se determina el eje 'y' en función de los valores mínimos y máximos
-    # plt.ylim(min(medias) - (min(medias) * 0.1),
-    #          max(medias) + (max(medias) * 0.1))
-
-    # p1 = plt.bar(ind, menMeans, width, yerr=menStd)
-
-    # barras.set(
-    #     xlabel='time (s)',
-    #     ylabel='voltage (mV)',
-    #     title='About as simple as it gets, folks'
-    # )
 
     plt.title(nombre_variable.title().replace("_", " "), fontsize=20, pad=20, weight='bold')
 
-    meses = (
-        'ene',
-        'feb',
-        'mar',
-        'abr',
-        'may',
-        'jun',
-        'jul',
-        'ago',
-        'sep',
-        'oct',
-        'nov',
-        'dic'
-    )
-
-    trimestres =(
-        '1er. trimestre',
-        "2º trimestre",
-        "3º trimestre",
-        "4º trimestre"
-    )
-
-    print(etiquetas_periodos)
-
-    if(len(medias) == 4):
-        plt.xticks(ticks=x+0.25, labels=trimestres, horizontalalignment='left') # , rotation=-45
-    else:
-        plt.xticks(ticks=x+0.25, labels=etiquetas_periodos, horizontalalignment='left')
+    plt.xticks(ticks=x, labels=etiquetas_periodos, horizontalalignment='center')
 
     plt.grid(barras, axis="y", alpha=0.3)
+
+    autolabel(barras)
+    # plt.xticks(fontweight='bold')
+    plt.yticks(fontweight='bold')
 
     ruta_archivo_imagen = os.getcwd() + '/media/media_' + nombre_variable + '.svg'
 
@@ -330,39 +348,24 @@ def search():
             if variable != "integrado": # no es una variable numérica
                 lista_por_variable = []
 
-                if variable == 'porcentaje_bajas':
-                    lista_por_variable.append(
-                        "{} %".format(round((table[variable].mean() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                    )
-                    lista_por_variable.append(
-                        "{} %".format(round((table[variable].std() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                    )
-                    lista_por_variable.append(
-                        "{} %".format(round((table[variable].min() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                    )
-                    lista_por_variable.append(
-                        "{} %".format(round((table[variable].max() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                    )
-                    lista_por_variable.append(
-                        "{} %".format(round((table[variable].var() * 100), 2)).replace(',','~').replace('.',',').replace('~','.')
-                    )
-                else:
-                    lista_por_variable.append(
-                        format((f'{table[variable].mean():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                    )
-                    lista_por_variable.append(
-                        format((f'{table[variable].std():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                    )
-                    lista_por_variable.append(
-                        format((f'{table[variable].min():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                    )
-                    lista_por_variable.append(
-                        format((f'{table[variable].max():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                    )
-                    lista_por_variable.append(
-                        format((f'{table[variable].var():,.3f}')).replace(',','~').replace('.', ',').replace('~', '.')
-                    )
+                lista_por_variable.append(
+                    dar_formato(nombre_variable=variable, valor=table[variable].mean()))
 
+                lista_por_variable.append(
+                    dar_formato(nombre_variable=variable,
+                                valor=table[variable].std()))
+
+                lista_por_variable.append(
+                    dar_formato(nombre_variable=variable,
+                                valor=table[variable].min()))
+
+                lista_por_variable.append(
+                    dar_formato(nombre_variable=variable,
+                                valor=table[variable].max()))
+
+                lista_por_variable.append(
+                    dar_formato(nombre_variable=variable,
+                                valor=table[variable].var()))
 
                 estadisticas[variable] = lista_por_variable
 
@@ -419,7 +422,7 @@ def search():
                 variable=variable
             )
             # print("Las medias son: ", medias)
-            grafico_evolucion_variables(
+            crear_graficos_sobre_consultas(
                 periodos=periodos,
                 medias=medias,
                 nombre_variable=variable,

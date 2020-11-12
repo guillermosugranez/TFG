@@ -40,7 +40,7 @@
         <script src="https://kit.fontawesome.com/dd867867e5.js" crossorigin="anonymous"></script>
 
     </head>
-    <body>
+    <body style="min-width: 640px;">
 
 
 
@@ -76,7 +76,7 @@
                         </div>
                         <div class="col-sm-4" id="nav-col3">
                             <div class="navbar-nav">
-                                <a class="nav-item nav-link" href="{{ url_for('register') }}">
+                                <a class="nav-item nav-link">
                                     {{ current_user.username }}
                                 </a>
                                 {% if current_user.is_authenticated %}
@@ -102,7 +102,7 @@
         <!--hero-->
         {% block hero %}{% endblock %}
 
-        <main class="container-fluid" id="body-main">
+        <main class="container-fluid" style="min-width: 640px;" id="body-main">
                 <!-- MENSAJES -->
 
             <!-- Con esto establecemos un contexto para desplegar mensajes
